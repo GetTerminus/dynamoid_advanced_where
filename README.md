@@ -63,6 +63,14 @@ Valid on field types: `string`
 #### Example
 `where{ foo == 'bar' }` and `where{ foo != 'bar' }`
 
+### Less than
+The less than for a field can be tested using `<`
+
+Valid on field types: `numeric`, and `datetime` (only when stored as a number)
+
+#### Example
+`where{ foo < 123 }` and `where{ foo < Date.today }`
+
 ### Boolean Operators
 
 | Logical Operator | Behavior      | Example
@@ -164,6 +172,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
     * Partially implemented
   * Not Equals
   * less than
+    * Implemented for numerics and datetimes stored as integer
   * less than or equal to
   * greater than
   * greater than or equal to

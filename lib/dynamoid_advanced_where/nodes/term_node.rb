@@ -57,6 +57,22 @@ module DynamoidAdvancedWhere
       end
       alias > greater_than
 
+      def less_than(other_value)
+        klass = LessThanNode.determine_subtype(
+          attribute_config,
+          other_value
+        )
+
+        self.child_nodes = create_subnode(
+          klass,
+          term_node: self,
+          value: other_value
+        )
+
+        self
+      end
+      alias < less_than
+
       def ne(other_value)
         eq(other_value).negate
       end
