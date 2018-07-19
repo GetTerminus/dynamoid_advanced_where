@@ -6,12 +6,19 @@ RSpec.describe "Upserting" do
       new_class(table_name: 'upsert_without_range_test') do
         field :simple_string
         field :numb, :number
+        field :string_date, :datetime, store_as_string: true
+        field :int_date, :datetime
       end
     end
 
     it "performs the 'sert' side of upsert" do
       expect(
-        klass.where{ !simple_string }.upsert(id, simple_string: 'hi')
+        klass.where{ !simple_string }.upsert(
+          id,
+          simple_string: 'hi',
+          string_date: 1.day.ago,
+          int_date: 1.day.ago,
+        )
       ).to be_a_kind_of(klass).and have_attributes(simple_string: 'hi')
     end
 
@@ -21,7 +28,10 @@ RSpec.describe "Upserting" do
 
       it "performs the conditional update" do
         expect{
-          klass.where{ numb > 2 }.upsert(item1.id, simple_string: 'hi')
+          klass.where{ numb > 2 }.upsert(
+            item1.id,
+            simple_string: 'hi',
+          )
         }.to change {
           item1.reload.simple_string
         }.from('foo').to('hi')

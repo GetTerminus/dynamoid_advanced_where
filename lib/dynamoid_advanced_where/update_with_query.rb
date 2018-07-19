@@ -49,7 +49,10 @@ module DynamoidAdvancedWhere
       obj = set_values.each_with_object(builder_hash) do |(k, v), h|
         prefix = SecureRandom.hex
         h[:expression_attribute_names]["##{prefix}"] = k
-        h[:expression_attribute_values][":#{prefix}"] = v
+        h[:expression_attribute_values][":#{prefix}"] = klass.dump_field(
+          v,
+          klass.attributes[k]
+        )
         set_expressions << "##{prefix} = :#{prefix}"
       end
 
