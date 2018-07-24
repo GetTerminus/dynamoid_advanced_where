@@ -120,9 +120,33 @@ But it will not be performed in these scenarios
 DAW provides the ability to modify records only if they meet the criteria defined
 by the where block.
 
-### Upserting
-You map perform an upsert using the `.upsert` method on a relation. For example,
-consider the following example for conditionally updating a string field.
+Changes are also provided in batch form, so you may change multiple values with a single call.
+There may also be singleton methods provided for easy of use.
+
+## Batch Updates
+
+```ruby
+Model.where{ conditions }.batch_update
+  .set_values(field_name1: 'value', field_name2: 123)
+  .append_to(arr_field_name: [1,2,3], set_field_name: %w[a b c])
+  .apply(hash_key, range_key)
+```
+
+Like all conditional updates it will return the full record with the new data
+if it successfully updates. If it fails to update, it will return nil.
+
+If the specified hash key, or hash/range key combination is not already present
+it will be inserted with the desired mutations (if possible).
+
+### Setting a single field
+The batch updated method `set_values(attr_name: new_attr_value, other_atter: val)`
+
+#### Shortcut Method
+You map perform an upsert using the `.upsert` method.  This method performs a
+simple set on the provided hash and range key.
+
+For example, consider the following example for conditionally updating a string
+field.
 
 ```ruby
 class Foo
@@ -151,6 +175,18 @@ the range key as the second parameter if required for the model.
 
 *Note:** Upsert will return nil if no records were found that matched the provided
 parameters
+
+### Appending values to a List or Set
+You can append a set of values to an existing set or array by using the
+
+```ruby
+append_to(
+  array_field: [1,2,3],
+  set_field: %w[foo bar],
+)
+```
+
+If the fields are unset, it will still apply the changes to am empty array.
 
 ## Development
 

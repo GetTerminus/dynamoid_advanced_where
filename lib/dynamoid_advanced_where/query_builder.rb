@@ -1,14 +1,12 @@
 require_relative './nodes'
 require_relative './query_materializer'
-require_relative './update_with_query'
+require_relative './batched_updater'
 
 module DynamoidAdvancedWhere
   class QueryBuilder
     attr_accessor :klass, :root_node
 
     delegate :all, to: :query_materializer
-
-    delegate :upsert, to: :update_with_query
 
     def initialize(klass:, &blk)
       self.klass = klass
@@ -19,8 +17,13 @@ module DynamoidAdvancedWhere
       QueryMaterializer.new(query_builder: self)
     end
 
-    def update_with_query
-      UpdateWithQuery.new(query_builder: self)
+    def batch_update
+      BatchedUpdater.new(query_builder: self)
+    end
+
+    def upsert(*args)
+      update_fields = args.extract_options!
+      batch_update.set_values(update_fields).apply(*args)
     end
   end
 end

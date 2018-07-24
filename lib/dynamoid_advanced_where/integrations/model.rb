@@ -7,6 +7,10 @@ module DynamoidAdvancedWhere
       extend ActiveSupport::Concern
 
       class_methods do
+        def batch_update
+          where{}.batch_update
+        end
+
         def where(*args, &blk)
           if args.length > 0
             if blk
