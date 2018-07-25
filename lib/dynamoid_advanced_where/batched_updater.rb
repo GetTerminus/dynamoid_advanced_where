@@ -82,41 +82,31 @@ module DynamoidAdvancedWhere
       filter
     end
 
-
-    def set_values_update_args
-      update_args = merge_multiple_sets([
-        explicit_set_args,
-        list_append_for_arrays
-      ])
-
+    def args_to_update_command(update_args, command: )
       return {} if update_args[:collected_update_expression].empty?
 
       update_args.merge!(
         collected_update_expression: [
-          "SET #{update_args[:collected_update_expression].join(', ')}"
+          "#{command} #{update_args[:collected_update_expression].join(', ')}"
         ]
+      )
+    end
+
+
+    def set_values_update_args
+      args_to_update_command(
+        merge_multiple_sets([explicit_set_args, list_append_for_arrays]),
+        command: 'SET'
       )
     end
 
     def add_update_args
-      update_args = merge_multiple_sets([
-        list_append_for_sets,
-      ])
-
-      return {} if update_args[:collected_update_expression].empty?
-
-      update_args.merge!(
-        collected_update_expression: [
-          "ADD #{update_args[:collected_update_expression].join(', ')}"
-        ]
-      )
+      args_to_update_command(list_append_for_sets, command: 'ADD')
     end
 
 
     def explicit_set_args
-      builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
-
-      builder_hash[:collected_update_expression] = []
+      builder_hash = { collected_update_expression: [] }
 
       _set_values.each_with_object(builder_hash) do |(k, v), h|
         prefix = merge_in_attr_placeholders(h, k, v)
@@ -125,9 +115,9 @@ module DynamoidAdvancedWhere
     end
 
     def list_append_for_sets
-      builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
 
-      builder_hash[:collected_update_expression] = []
+      builder_hash = { collected_update_expression: [] }
+
       _set_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k,v|
           prefix = merge_in_attr_placeholders(h, k, v)
@@ -137,12 +127,14 @@ module DynamoidAdvancedWhere
     end
 
     def list_append_for_arrays
-      builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
-
       empty_list_prefix = SecureRandom.hex
 
-      builder_hash[:expression_attribute_values][":#{empty_list_prefix}"] = []
-      builder_hash[:collected_update_expression] = []
+      builder_hash = {
+        collected_update_expression: [],
+        expression_attribute_values: {
+          ":#{empty_list_prefix}": []
+        }
+      }
 
       update_args = _array_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k,v|
