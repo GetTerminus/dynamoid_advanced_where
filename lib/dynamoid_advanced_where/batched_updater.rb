@@ -50,129 +50,108 @@ module DynamoidAdvancedWhere
 
     private
 
-    def field_update_arguments
-      all_update_args = {update_expression: []}
-
-      [
-        set_values_update_args
-      ].each do |update_data|
-        all_update_args[:update_expression] << update_data.delete(:update_expression)
-        all_update_args.merge!(update_data, &method(:hash_extendeer))
+    def merge_multiple_sets(items_to_merge, result_base: {})
+      default = {collected_update_expression: []}
+      result = result_base.merge(default)
+      items_to_merge.each do |update_data|
+        result[:collected_update_expression] << update_data.delete(:collected_update_expression)
+        result.merge!(update_data, &method(:hash_extendeer))
       end
-      all_update_args[:update_expression] = all_update_args[:update_expression].join(', ')
 
-      all_update_args
+      result[:collected_update_expression].flatten!
+      result[:collected_update_expression].reject!(&:blank?)
+
+      return default if result[:collected_update_expression].empty?
+
+      result
+    end
+
+    def field_update_arguments
+      merge_multiple_sets([set_values_update_args])
     end
 
     def update_item_arguments
-      # Grab conditions for row filtering
-      filter = filter_builder.to_scan_filter
+      filter = merge_multiple_sets(
+        [ field_update_arguments, add_update_args ],
+        result_base: filter_builder.to_scan_filter,
+      )
 
-      update_expressions = []
-      [
-        field_update_arguments,
-        add_update_args
-      ].each do |partial_args|
-        update_expressions << partial_args.delete(:update_expression)
-        filter.merge!(partial_args, &method(:hash_extendeer))
-      end
-
+      filter[:update_expression] = filter.delete(:collected_update_expression).join(' ')
       filter[:condition_expression] = filter.delete(:filter_expression)
-      filter[:update_expression] = update_expressions.join(' ')
 
       filter
     end
 
 
     def set_values_update_args
-      final_args = {}
-      all_update_expressions = []
-
-      [
+      update_args = merge_multiple_sets([
         explicit_set_args,
-        list_append_for_arrays,
-      ].each_with_object(final_args) do |new_args, hsh|
-        all_update_expressions << new_args.delete(:set_expressions)
-        hsh.merge!(new_args, &method(:hash_extendeer))
-      end
+        list_append_for_arrays
+      ])
 
-      update_expressions = all_update_expressions.flatten.reject(&:blank?)
-      final_args[:update_expression] = "SET #{update_expressions.join(', ')}"
+      return {} if update_args[:collected_update_expression].empty?
 
-      final_args
+      update_args.merge!(
+        collected_update_expression: [
+          "SET #{update_args[:collected_update_expression].join(', ')}"
+        ]
+      )
     end
 
     def add_update_args
-      final_args = {}
-      all_update_expressions = []
-
-      [
+      update_args = merge_multiple_sets([
         list_append_for_sets,
-      ].each_with_object(final_args) do |new_args, hsh|
-        all_update_expressions << new_args.delete(:set_expressions)
-        hsh.merge!(new_args, &method(:hash_extendeer))
-      end
-      all_update_expressions.reject!(&:blank?)
+      ])
 
-      return {} if all_update_expressions.empty?
+      return {} if update_args[:collected_update_expression].empty?
 
-      final_args[:update_expression] = "ADD #{all_update_expressions.join(', ')}"
-
-      final_args
+      update_args.merge!(
+        collected_update_expression: [
+          "ADD #{update_args[:collected_update_expression].join(', ')}"
+        ]
+      )
     end
 
 
     def explicit_set_args
       builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
 
-      set_expressions = []
-      obj = _set_values.each_with_object(builder_hash) do |(k, v), h|
+      builder_hash[:collected_update_expression] = []
+
+      _set_values.each_with_object(builder_hash) do |(k, v), h|
         prefix = merge_in_attr_placeholders(h, k, v)
-        set_expressions << "##{prefix} = :#{prefix}"
+        h[:collected_update_expression] << "##{prefix} = :#{prefix}"
       end
-
-      obj[:set_expressions] = set_expressions
-
-      obj
     end
 
     def list_append_for_sets
       builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
 
-      set_expressions = []
-
-      obj = _set_appends.each_with_object(builder_hash) do |to_append, h|
+      builder_hash[:collected_update_expression] = []
+      _set_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k,v|
           prefix = merge_in_attr_placeholders(h, k, v)
-          set_expressions << "##{prefix} :#{prefix}"
+          builder_hash[:collected_update_expression] << "##{prefix} :#{prefix}"
         end
       end
-
-      obj[:set_expressions] = set_expressions
-
-      obj
     end
 
     def list_append_for_arrays
       builder_hash = Hash.new{|h,k| h[k] = Hash.new{|h2, k2| h2[k2] = {} } }
 
-      set_expressions = []
       empty_list_prefix = SecureRandom.hex
 
       builder_hash[:expression_attribute_values][":#{empty_list_prefix}"] = []
+      builder_hash[:collected_update_expression] = []
 
-      obj = _array_appends.each_with_object(builder_hash) do |to_append, h|
+      update_args = _array_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k,v|
           prefix = merge_in_attr_placeholders(h, k, v)
-          set_expressions << "##{prefix}  = list_append(if_not_exists(##{prefix}, :#{empty_list_prefix}), :#{prefix})"
+          builder_hash[:collected_update_expression] << "##{prefix}  = list_append(if_not_exists(##{prefix}, :#{empty_list_prefix}), :#{prefix})"
         end
       end
 
-      return {} if set_expressions.empty?
-
-      obj[:set_expressions] = set_expressions
-
-      obj
+      builder_hash[:collected_update_expression].empty? ? {} : update_args
     end
 
     def merge_in_attr_placeholders(hsh, field_name, value)
