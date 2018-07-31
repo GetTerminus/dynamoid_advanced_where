@@ -19,6 +19,12 @@ module DynamoidAdvancedWhere
 
       def eq(other_value)
         self.child_nodes = case other_value
+                           when TrueClass, FalseClass
+                             create_subnode(
+                               BooleanEqualityNode,
+                               term_node: self,
+                               value: other_value
+                             )
                            when String
                              create_subnode(
                                EqualityNode,
