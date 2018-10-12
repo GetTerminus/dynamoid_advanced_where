@@ -4,6 +4,7 @@ RSpec.describe "Attribute Existance" do
   let(:klass) do
     new_class(table_name: 'attr_exist', table_opts: {key: :bar} ) do
       field :simple_string
+      field :other_simple_string
     end
   end
 
@@ -30,6 +31,16 @@ RSpec.describe "Attribute Existance" do
       expect(
         klass.where{ !simple_string }.all
       ).to match_array [item1, item2]
+    end
+
+    it "allows chaining" do
+      item1 = klass.create(other_simple_string: 'bar', simple_string: nil)
+      klass.create(other_simple_string: 'bar', simple_string: 'dude')
+      klass2.create
+
+      expect(
+        klass.where{ (other_simple_string == 'bar') & (!simple_string) }.all
+      ).to match_array [item1]
     end
   end
 
