@@ -135,8 +135,7 @@ filter2 = Foo.where{ baz == 'dude' }
 # All of these produce the same results
 combination1 = filter1.where(filter2)
 combination2 = filter1.and(filter2)
-combination3 = filter1 + filter2
-combination5 = filter1.where{ baz == 'dude' }
+combination3 = filter1.where{ baz == 'dude' }
 ```
 
 ## Mutating Records

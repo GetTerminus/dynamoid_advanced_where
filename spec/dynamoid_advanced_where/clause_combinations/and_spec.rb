@@ -55,12 +55,6 @@ RSpec.describe "Combining multiple queries with &" do
         base_filter.and(second_filter).all
       ).to eq [instance1]
     end
-
-    it "allows combinations with +" do
-      expect(
-        (klass.where{ simple_string == 'a'}  + second_filter).all
-      ).to eq [instance1]
-    end
   end
 
 end

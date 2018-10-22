@@ -37,7 +37,6 @@ module DynamoidAdvancedWhere
       dup.tap{|q| q.combine_with!(other_builder.root_node, Nodes::AndNode) }
     end
     alias and where
-    alias + where
 
     def dup
       self.class.new(klass: klass).tap{|b| b.root_node = root_node.dup }
