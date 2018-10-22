@@ -13,6 +13,12 @@ module DynamoidAdvancedWhere
         exists!
       end
 
+      def dup
+        self.class.new(term: term, klass: klass).tap do |e|
+          e.child_nodes = dup_children
+        end
+      end
+
       def exists!
         self.child_nodes = create_subnode(ExistsNode, term_node: self)
       end

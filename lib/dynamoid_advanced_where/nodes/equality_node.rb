@@ -11,6 +11,12 @@ module DynamoidAdvancedWhere
         self.value = value
       end
 
+      def dup
+        self.class.new(term_node: term_node, value: value, klass: klass).tap do |e|
+          e.child_nodes = dup_children
+        end
+      end
+
       def to_condition_expression
         "##{expression_prefix} = :#{expression_prefix}V"
       end

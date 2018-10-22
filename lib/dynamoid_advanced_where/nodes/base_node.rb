@@ -11,6 +11,12 @@ module DynamoidAdvancedWhere
         evaluate_block(blk) if blk
       end
 
+      def dup
+        self.class.new(klass: klass).tap do |e|
+          e.child_nodes = dup_children
+        end
+      end
+
       def evaluate_block(blk)
         self.and(self.instance_eval(&blk))
       end
@@ -79,6 +85,10 @@ module DynamoidAdvancedWhere
 
       def attribute_config
         klass.attributes[term]
+      end
+
+      def dup_children
+        child_nodes.is_a?(Array) ? child_nodes.map(&:dup) : child_nodes.dup
       end
     end
   end
