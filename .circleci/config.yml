@@ -5,6 +5,10 @@ jobs:
     docker:
       - image: ruby:2.5
       - image: cnadiminti/dynamodb-local
+        environment:
+          MAX_HEAP_SIZE: 2048m
+          HEAP_NEWSIZE: 512m
+
     steps:
       - checkout
       - restore_cache:
