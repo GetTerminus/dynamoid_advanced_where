@@ -32,7 +32,7 @@ GEM
       jmespath (~> 1.0)
     aws-sdk-resources (2.11.37)
       aws-sdk-core (= 2.11.37)
-    aws-sigv4 (1.0.2)
+    aws-sigv4 (1.0.3)
     bundle-audit (0.1.0)
       bundler-audit
     bundler-audit (0.6.0)
