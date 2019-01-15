@@ -11,9 +11,8 @@ module DynamoidAdvancedWhere
         self.value = value
       end
 
-
       def to_condition_expression
-         "attribute_exists(##{expression_prefix})"
+         "attribute_exists(##{expression_prefix}) or ##{expression_prefix} = NOT_NULL"
       end
 
       def expression_attribute_names
