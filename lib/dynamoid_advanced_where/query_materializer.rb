@@ -45,6 +45,7 @@ module DynamoidAdvancedWhere
       end
     end
 
+
     def each_via_scan
       query = {
         table_name: table_name
