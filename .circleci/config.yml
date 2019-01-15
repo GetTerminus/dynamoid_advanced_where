@@ -6,7 +6,7 @@ jobs:
       - image: ruby:2.5
       - image: amazon/dynamodb-local
         environment:
-          MAX_HEAP_SIZE: 2048m
+          MAX_HEAP_SIZE: 1024m
           HEAP_NEWSIZE: 512m
 
     steps:
