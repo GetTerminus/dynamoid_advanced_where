@@ -40,8 +40,6 @@ RSpec.describe "Attribute Existance" do
       item1.save
       item2 = klass2.create
 
-      binding.pry
-
       expect(
         klass.where{ !simple_string }.all
       ).to match_array [item1, item2]
