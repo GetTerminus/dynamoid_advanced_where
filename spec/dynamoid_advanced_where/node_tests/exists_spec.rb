@@ -33,6 +33,20 @@ RSpec.describe "Attribute Existance" do
       ).to match_array [item1, item2]
     end
 
+    it "finds nulled when negated" do
+      klass.create(simple_string: 'foo')
+      item1 = klass.create(simple_string: 'foobar')
+      item1.simple_string = nil
+      item1.save
+      item2 = klass2.create
+
+      binding.pry
+
+      expect(
+        klass.where{ !simple_string }.all
+      ).to match_array [item1, item2]
+    end
+
     it "allows chaining" do
       item1 = klass.create(other_simple_string: 'bar', simple_string: nil)
       klass.create(other_simple_string: 'bar', simple_string: 'dude')
