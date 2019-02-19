@@ -47,7 +47,7 @@ GEM
     fasterer (0.4.1)
       colorize (~> 0.7)
       ruby_parser (~> 3.11.0)
-    ffi (1.9.23)
+    ffi (1.10.0)
     i18n (1.5.3)
       concurrent-ruby (~> 1.0)
     iniparse (1.4.4)
