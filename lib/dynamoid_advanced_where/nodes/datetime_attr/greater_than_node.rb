@@ -42,6 +42,10 @@ module DynamoidAdvancedWhere
             ":#{expression_prefix}V" => value
           }
         end
+
+        def build_dup
+          self.class.new(term_node: term_node, value: value, klass: klass)
+        end
       end
     end
   end

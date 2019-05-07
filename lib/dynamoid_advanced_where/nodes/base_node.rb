@@ -12,9 +12,13 @@ module DynamoidAdvancedWhere
       end
 
       def dup
-        self.class.new(klass: klass).tap do |e|
+        build_dup.tap do |e|
           e.child_nodes = dup_children
         end
+      end
+
+      def build_dup
+        self.class.new(klass: klass)
       end
 
       def evaluate_block(blk)
