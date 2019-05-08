@@ -4,7 +4,7 @@ module DynamoidAdvancedWhere
       class LessThanNode < BaseNode
         delegate :term, to: :term_node
 
-        attr_accessor :term_node, :value, :original_valuee
+        attr_accessor :term_node, :value, :original_value
 
         def initialize(term_node: , value: , **args)
           super(args)
