@@ -6,7 +6,7 @@ module DynamoidAdvancedWhere
   class QueryBuilder
     attr_accessor :klass, :root_node
 
-    delegate :all, to: :query_materializer
+    delegate :all, :each, to: :query_materializer
     delegate :combine_with!, to: :root_node
 
     def initialize(klass:, &blk)
