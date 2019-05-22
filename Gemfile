@@ -7,5 +7,5 @@ gemspec
 
 gem 'pry'
 gem 'dynamoid', github: 'dynamoid/dynamoid'
-gem 'activemodel', '< 5.2'
+gem 'activemodel', '< 5.3'
 
