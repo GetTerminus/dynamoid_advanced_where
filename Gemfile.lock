@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/dynamoid/dynamoid
-  revision: eb9276e0cc5a0823ddb144f618daebcfaa7dd15b
+  revision: c82646654c149d2cf885b163cbfe70edbf40d8c0
   specs:
-    dynamoid (3.1.0)
+    dynamoid (3.2.0)
       activemodel (>= 4)
       aws-sdk-dynamodb (~> 1)
       concurrent-ruby (>= 1.0)
@@ -25,15 +25,15 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     ast (2.4.0)
-    aws-eventstream (1.0.2)
-    aws-partitions (1.146.0)
-    aws-sdk-core (3.48.2)
+    aws-eventstream (1.0.3)
+    aws-partitions (1.203.0)
+    aws-sdk-core (3.63.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-dynamodb (1.25.0)
-      aws-sdk-core (~> 3, >= 3.48.2)
+    aws-sdk-dynamodb (1.34.0)
+      aws-sdk-core (~> 3, >= 3.61.1)
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
