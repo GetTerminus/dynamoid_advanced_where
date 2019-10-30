@@ -1,7 +1,7 @@
 require "bundler/setup"
 require "dynamoid_advanced_where"
 require "dynamoid"
-require "aws-sdk"
+require "aws-sdk-dynamodb"
 require "pry"
 
 ENV['ACCESS_KEY'] ||= 'abcd'

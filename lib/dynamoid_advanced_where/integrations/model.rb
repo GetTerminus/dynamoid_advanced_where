@@ -14,6 +14,10 @@ module DynamoidAdvancedWhere
           )
         end
 
+        def batch_update
+          where{}.batch_update
+        end
+
         def where(*args, &blk)
           if args.length > 0
             if blk

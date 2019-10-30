@@ -71,7 +71,9 @@ module DynamoidAdvancedWhere
     end
 
     def term_node_valid_for_key_filter(term_node)
-      term_node.term.to_s == hash_key && term_node.child_nodes.is_a?(Nodes::EqualityNode)
+      term_node.is_a?(Nodes::TermNode) &&
+        term_node.term.to_s == hash_key &&
+        term_node.child_nodes.is_a?(Nodes::EqualityNode)
     end
 
     def extract_range_key_node

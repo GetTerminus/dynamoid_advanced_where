@@ -63,6 +63,25 @@ Valid on field types: `string`
 #### Example
 `where{ foo == 'bar' }` and `where{ foo != 'bar' }`
 
+### Less than
+The less than for a field can be tested using `<`
+
+Valid on field types: `numeric`, and `datetime` (only when stored as a number)
+
+#### Example
+`where{ foo < 123 }` and `where{ foo < Date.today }`
+
+### Includes
+This operator may be used to check if:
+
+* A string contains another substring
+* A set of String or Integers contain a given value
+
+Valid on field types: `string`, or `set` of `String` / `Integer`
+
+#### Example
+`where{ foo.includes?(123) }` and `where{ foo.includes?('foo') }`
+
 ### Boolean Operators
 
 | Logical Operator | Behavior      | Example
@@ -108,13 +127,59 @@ But it will not be performed in these scenarios
 * `where{ !(id == '123') }`
 * <code>where{ (id == '123') &#124; (bar == 'baz') }</code>
 
+## Combination of Filters
+Multiple DAW filters can be combined. This will provides the ability to compose
+filtering conditions to keep your code more readable and DRY.
+
+### Combining conditions with AND
+```ruby
+class Foo
+  include Dynamoid::Document
+
+  field :bar
+  field :baz
+end
+
+filter1 = Foo.where{ bar == 'abcd' }
+filter2 = Foo.where{ baz == 'dude' }
+
+# All of these produce the same results
+combination1 = filter1.where(filter2)
+combination2 = filter1.and(filter2)
+combination3 = filter1.where{ baz == 'dude' }
+```
+
 ## Mutating Records
 DAW provides the ability to modify records only if they meet the criteria defined
 by the where block.
 
-### Upserting
-You map perform an upsert using the `.upsert` method on a relation. For example,
-consider the following example for conditionally updating a string field.
+Changes are also provided in batch form, so you may change multiple values with a single call.
+There may also be singleton methods provided for easy of use.
+
+## Batch Updates
+
+```ruby
+Model.where{ conditions }.batch_update
+  .set_values(field_name1: 'value', field_name2: 123)
+  .append_to(arr_field_name: [1,2,3], set_field_name: %w[a b c])
+  .apply(hash_key, range_key)
+```
+
+Like all conditional updates it will return the full record with the new data
+if it successfully updates. If it fails to update, it will return nil.
+
+If the specified hash key, or hash/range key combination is not already present
+it will be inserted with the desired mutations (if possible).
+
+### Setting a single field
+The batch updated method `set_values(attr_name: new_attr_value, other_atter: val)`
+
+#### Shortcut Method
+You map perform an upsert using the `.upsert` method.  This method performs a
+simple set on the provided hash and range key.
+
+For example, consider the following example for conditionally updating a string
+field.
 
 ```ruby
 class Foo
@@ -141,6 +206,45 @@ and force an update to occur.
 **Note:** Upsert must be called with the hash as the first parameter, and
 the range key as the second parameter if required for the model.
 
+*Note:** Upsert will return nil if no records were found that matched the provided
+parameters
+
+### Appending values to a List or Set
+You can append a set of values to an existing set or array by using the
+
+```ruby
+append_to(
+  array_field: [1,2,3],
+  set_field: %w[foo bar],
+)
+```
+
+If the fields are unset, it will still apply the changes to am empty array.
+
+### Increment / Decrement a value
+
+You may increment or decrement a numeric value by using `increment` or `decrement`
+
+```ruby
+increment(:field_one, :field_two)
+```
+
+```ruby
+decrement(:field_one, :field_two)
+```
+
+You may also provide an optional `by:` config to increment by more than one.
+
+```ruby
+increment(:field_one, :field_two, by: 3)
+```
+
+```ruby
+decrement(:field_one, :field_two, by: 3)
+```
+
+If the value of the field is currently unset, it will initialize to zero
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -161,6 +265,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
     * Partially implemented
   * Not Equals
   * less than
+    * Implemented for numerics, datetimes, dates stored as integer
   * less than or equal to
   * greater than
   * greater than or equal to

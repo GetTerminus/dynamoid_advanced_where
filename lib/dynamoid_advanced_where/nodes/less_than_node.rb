@@ -1,17 +1,17 @@
 module DynamoidAdvancedWhere
   module Nodes
-    class GreaterThanNode < BaseNode
+    class LessThanNode < BaseNode
       class << self
         def determine_subtype(attr_config, value)
           case attr_config[:type]
           when :number
-            NumberAttr::GreaterThanNode
+            NumberAttr::LessThanNode
           when :datetime
-            DatetimeAttr::GreaterThanNode
+            DatetimeAttr::LessThanNode
           when :date
-            DateAttr::GreaterThanNode
+            DateAttr::LessThanNode
           else
-            raise ArgumentError, "Unable to perform greater than on field of type #{attr_config[:type]}"
+            raise ArgumentError, "Unable to perform less than on field of type #{attr_config[:type]}"
           end
         end
       end

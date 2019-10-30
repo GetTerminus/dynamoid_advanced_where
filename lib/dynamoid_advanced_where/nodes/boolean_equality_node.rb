@@ -1,6 +1,6 @@
 module DynamoidAdvancedWhere
   module Nodes
-    class EqualityNode < BaseNode
+    class BooleanEqualityNode < BaseNode
       delegate :term, to: :term_node
 
       attr_accessor :term_node, :value
@@ -9,12 +9,6 @@ module DynamoidAdvancedWhere
         super(args)
         self.term_node = term_node
         self.value = value
-      end
-
-      def dup
-        self.class.new(term_node: term_node, value: value, klass: klass).tap do |e|
-          e.child_nodes = dup_children
-        end
       end
 
       def to_condition_expression
@@ -29,8 +23,24 @@ module DynamoidAdvancedWhere
 
       def expression_attribute_values
         {
-          ":#{expression_prefix}V" => value
+          ":#{expression_prefix}V" => cast_value
         }
+      end
+
+      private
+
+      def cast_value
+        if attribute_config[:store_as_native_boolean]
+          value
+        elsif value == true
+          't'
+        else
+          'f'
+        end
+      end
+
+      def attribute_config
+        klass.attributes[term]
       end
     end
   end
