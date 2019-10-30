@@ -7,6 +7,13 @@ module DynamoidAdvancedWhere
       extend ActiveSupport::Concern
 
       class_methods do
+        def advanced_where(&blk)
+          DynamoidAdvancedWhere::QueryBuilder.new(
+            klass: self,
+            &blk
+          )
+        end
+
         def where(*args, &blk)
           if args.length > 0
             if blk
