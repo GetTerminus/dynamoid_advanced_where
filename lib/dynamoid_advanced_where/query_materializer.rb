@@ -16,7 +16,6 @@ module DynamoidAdvancedWhere
       self.query_builder = query_builder
     end
 
-
     def all
       each.to_a
     end

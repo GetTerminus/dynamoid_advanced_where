@@ -7,8 +7,8 @@ RSpec.describe "Batch set_values" do
       field :simple_string
       field :string_datetime, :datetime, store_as_string: true
       field :standard_datetime, :datetime
-      field :test_set, :set, of: :strings
-      field :test_arr, :array, of: :integers
+      field :test_set, :set, of: :string
+      field :test_arr, :array, of: :integer
     end
   end
 
