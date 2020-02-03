@@ -2,18 +2,18 @@ module DynamoidAdvancedWhere
   module Nodes
     module NumberAttr
       class LessThanNode < BaseNode
-        delegate :term, to: :term_node
+        delegate :term, to: :field_node
 
-        attr_accessor :term_node, :value
+        attr_accessor :field_node, :value
 
-        def initialize(term_node: , value: , **args)
+        def initialize(field_node: , value: , **args)
           if !value.is_a?(Numeric)
             raise ArgumentError, "Unable to perform less than on value of type #{value.class}"
           end
 
           super(args)
 
-          self.term_node = term_node
+          self.field_node = field_node
           self.value = value
         end
 

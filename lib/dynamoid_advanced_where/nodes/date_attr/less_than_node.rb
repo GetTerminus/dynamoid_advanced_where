@@ -2,13 +2,13 @@ module DynamoidAdvancedWhere
   module Nodes
     module DateAttr
       class LessThanNode < BaseNode
-        delegate :term, to: :term_node
+        delegate :term, to: :field_node
 
-        attr_accessor :term_node, :value
+        attr_accessor :field_node, :value
 
-        def initialize(term_node: , value: , **args)
+        def initialize(field_node: , value: , **args)
           super(args)
-          self.term_node = term_node
+          self.field_node = field_node
 
           if !value.is_a?(Date) || value.is_a?(DateTime)
             raise ArgumentError, "Unable to perform less than on date with a value of type #{value.class}. Expected Date"
@@ -38,7 +38,7 @@ module DynamoidAdvancedWhere
         end
 
         def build_dup
-          self.class.new(term_node: term_node, value: value, klass: klass)
+          self.class.new(field_node: field_node, value: value, klass: klass)
         end
       end
     end

@@ -27,7 +27,7 @@ module DynamoidAdvancedWhere
 
       def method_missing(method, *args, &blk)
         if allowed_field?(method)
-          create_subnode(TermNode, term: method, &blk)
+          create_subnode(FieldNode, term: method, &blk)
         else
           super
         end

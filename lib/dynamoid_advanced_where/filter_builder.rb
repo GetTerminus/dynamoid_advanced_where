@@ -58,22 +58,22 @@ module DynamoidAdvancedWhere
     def extract_query_filter_node
       @query_filter_node ||=
         case first_node
-        when Nodes::TermNode
-          if term_node_valid_for_key_filter(first_node)
+        when Nodes::FieldNode
+          if field_node_valid_for_key_filter(first_node)
             self.query_builder.root_node.child_nodes.delete_at(0)
           end
         when Nodes::AndNode
           if first_node.negated? == false
-            hash_node_idx = first_node.child_nodes.index(&method(:term_node_valid_for_key_filter))
+            hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
             first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
           end
         end
     end
 
-    def term_node_valid_for_key_filter(term_node)
-      term_node.is_a?(Nodes::TermNode) &&
-        term_node.term.to_s == hash_key &&
-        term_node.child_nodes.is_a?(Nodes::EqualityNode)
+    def field_node_valid_for_key_filter(field_node)
+      field_node.is_a?(Nodes::FieldNode) &&
+        field_node.term.to_s == hash_key &&
+        field_node.child_nodes.is_a?(Nodes::EqualityNode)
     end
 
     def extract_range_key_node
@@ -82,14 +82,14 @@ module DynamoidAdvancedWhere
         case first_node
         when Nodes::AndNode
           if first_node.negated? == false
-            hash_node_idx = first_node.child_nodes.index(&method(:term_node_valid_for_range_filter))
+            hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_range_filter))
             first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
           end
         end
     end
 
-    def term_node_valid_for_range_filter(term_node)
-      term_node.term.to_s == range_key && VALID_COMPARETORS_FOR_RANGE_FILTER.any?{|type| term_node.child_nodes.is_a?(type)  }
+    def field_node_valid_for_range_filter(field_node)
+      field_node.term.to_s == range_key && VALID_COMPARETORS_FOR_RANGE_FILTER.any?{|type| field_node.child_nodes.is_a?(type)  }
     end
 
     def first_node

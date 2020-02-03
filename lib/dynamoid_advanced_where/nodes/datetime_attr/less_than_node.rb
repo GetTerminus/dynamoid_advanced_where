@@ -2,14 +2,14 @@ module DynamoidAdvancedWhere
   module Nodes
     module DatetimeAttr
       class LessThanNode < BaseNode
-        delegate :term, to: :term_node
+        delegate :term, to: :field_node
 
-        attr_accessor :term_node, :value, :original_value
+        attr_accessor :field_node, :value, :original_value
 
-        def initialize(term_node: , value: , **args)
+        def initialize(field_node: , value: , **args)
           super(args)
 
-          self.term_node = term_node
+          self.field_node = field_node
           self.original_value = value
 
           if !value.is_a?(Date) && !value.is_a?(Time)
@@ -45,7 +45,7 @@ module DynamoidAdvancedWhere
         end
 
         def build_dup
-          self.class.new(term_node: term_node, value: original_value, klass: klass)
+          self.class.new(field_node: field_node, value: original_value, klass: klass)
         end
       end
     end

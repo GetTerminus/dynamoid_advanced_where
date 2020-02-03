@@ -2,13 +2,13 @@ module DynamoidAdvancedWhere
   module Nodes
     module DateAttr
       class GreaterThanNode < Nodes::GreaterThanNode
-        delegate :term, to: :term_node
+        delegate :term, to: :field_node
 
-        attr_accessor :term_node, :value
+        attr_accessor :field_node, :value
 
-        def initialize(term_node: , value: , **args)
+        def initialize(field_node: , value: , **args)
           super(args)
-          self.term_node = term_node
+          self.field_node = field_node
 
           if !value.is_a?(Date) || value.is_a?(DateTime)
             raise ArgumentError, "Unable to perform greater than on date with a value of type #{value.class}. Expected Date"

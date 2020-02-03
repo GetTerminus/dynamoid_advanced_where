@@ -1,13 +1,13 @@
 module DynamoidAdvancedWhere
   module Nodes
     class ExistsNode < BaseNode
-      delegate :term, to: :term_node
+      delegate :term, to: :field_node
 
-      attr_accessor :term_node, :value
+      attr_accessor :field_node, :value
 
-      def initialize(term_node: , **args)
+      def initialize(field_node: , **args)
         super(args)
-        self.term_node = term_node
+        self.field_node = field_node
         self.value = value
       end
 
@@ -27,7 +27,7 @@ module DynamoidAdvancedWhere
       end
 
       def dup
-        self.class.new(term_node: term_node, klass: klass)
+        self.class.new(field_node: field_node, klass: klass)
       end
     end
   end
