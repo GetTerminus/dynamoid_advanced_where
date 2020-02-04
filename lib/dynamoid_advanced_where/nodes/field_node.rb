@@ -90,7 +90,18 @@ module DynamoidAdvancedWhere
       end
     end
 
-    class NumericDateAttributeNode < NumericDatetimeAttributeNode; end
+    class NumericDateAttributeNode < FieldNode
+      include Concerns::SupportsGreaterThan
+
+      def parse_right_hand_side(val)
+        if !val.is_a?(Date) || val.is_a?(DateTime)
+          raise ArgumentError, "unable to compare date to type #{val.class}"
+        end
+
+        (val - Dynamoid::Persistence::UNIX_EPOCH_DATE).to_i
+      end
+    end
+
 
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
@@ -104,8 +115,8 @@ module DynamoidAdvancedWhere
 
       # Datetime fields
       { type: :datetime, store_as_string: true } => nil,
-      { type: :datetime, store_as_string: false } => NumericDateAttributeNode,
-      { type: :datetime } => NumericDateAttributeNode,
+      { type: :datetime, store_as_string: false } => NumericDatetimeAttributeNode,
+      { type: :datetime } => NumericDatetimeAttributeNode,
 
       # Date fields
       { type: :date, store_as_string: true } => nil,

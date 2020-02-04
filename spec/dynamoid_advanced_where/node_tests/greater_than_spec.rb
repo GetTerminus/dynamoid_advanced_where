@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe "Greater Than" do
   let(:klass) do
-    new_class(table_name: 'greater_than_test', table_opts: {key: :bar} ) do
+    new_class(table_name: "greater_than_test", table_opts: {key: :bar} ) do
       field :simple_string
       field :num, :number
       field :string_date, :datetime, store_as_string: true
@@ -87,7 +87,7 @@ RSpec.describe "Greater Than" do
         klass.where{ int_date > 'abc'}.all
       }.to raise_error(
         ArgumentError,
-        'unable to compare datetime to type String'
+        'unable to compare date to type String'
       )
     end
 
@@ -96,7 +96,7 @@ RSpec.describe "Greater Than" do
         klass.where{ int_date > DateTime.now}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on date with a value of type DateTime. Expected Date'
+        'unable to compare date to type DateTime'
       )
     end
 
@@ -105,7 +105,7 @@ RSpec.describe "Greater Than" do
         klass.where{ int_date > Time.now}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on date with a value of type Time. Expected Date'
+        'unable to compare date to type Time'
       )
     end
 
