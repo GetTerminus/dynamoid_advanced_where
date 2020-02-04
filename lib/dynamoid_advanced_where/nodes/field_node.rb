@@ -2,12 +2,15 @@
 
 require_relative './equality_node'
 require_relative './greater_than_node'
+require_relative './exists_node'
+require_relative './includes'
 
 module DynamoidAdvancedWhere
   module Nodes
 
     class FieldNode < BaseNode
       include Concerns::SupportsEquality
+      include Concerns::SupportsExistance
 
       attr_accessor :klass, :field_name, :attr_prefix
 
@@ -51,7 +54,9 @@ module DynamoidAdvancedWhere
       end
     end
 
-    class StringAttributeNode < FieldNode; end
+    class StringAttributeNode < FieldNode
+      include Concerns::SupportsIncludes
+    end
     class NativeBooleanAttributeNode < FieldNode; end
 
     class StringBooleanAttributeNode < FieldNode
@@ -102,6 +107,25 @@ module DynamoidAdvancedWhere
       end
     end
 
+    class StringSetAttributeNode < FieldNode
+      include Concerns::SupportsIncludes
+
+      def parse_right_hand_side(val)
+        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(String)
+
+        val
+      end
+    end
+
+    class IntegerSetAttributeNode < FieldNode
+      include Concerns::SupportsIncludes
+
+      def parse_right_hand_side(val)
+        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(Integer)
+
+        val
+      end
+    end
 
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
@@ -122,6 +146,10 @@ module DynamoidAdvancedWhere
       { type: :date, store_as_string: true } => nil,
       { type: :date, store_as_string: false } => NumericDateAttributeNode,
       { type: :date } => NumericDateAttributeNode,
+
+      # Set Types
+      { type: :set, of: :string } => StringSetAttributeNode,
+      { type: :set, of: :integer } => IntegerSetAttributeNode,
     }.freeze
   end
 end

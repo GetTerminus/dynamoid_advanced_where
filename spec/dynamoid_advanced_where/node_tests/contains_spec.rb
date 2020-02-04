@@ -18,7 +18,7 @@ RSpec.describe 'Contains' do
       klass.where{ simple_int.includes?('a') }.all
     }.to raise_error(
       ArgumentError,
-      'Unable to perform includes on field'
+      /unable to find field type for/
     )
   end
 

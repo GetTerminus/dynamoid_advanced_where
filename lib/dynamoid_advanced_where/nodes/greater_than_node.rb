@@ -1,8 +1,6 @@
 module DynamoidAdvancedWhere
   module Nodes
     class GreaterThanNode < OperationNode
-      include Concerns::Negatable
-
       self.operator = '>'
     end
 

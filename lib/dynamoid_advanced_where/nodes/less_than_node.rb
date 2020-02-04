@@ -1,8 +1,8 @@
+# frozen_string_literal: true
+
 module DynamoidAdvancedWhere
   module Nodes
     class LessThanNode < OperationNode
-      include Concerns::Negatable
-
       self.operator = '<'
     end
 

@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
+require_relative './not'
+
 module DynamoidAdvancedWhere
   module Nodes
     class OperationNode < BaseNode
+      include Concerns::Negatable
+
       class << self
         attr_accessor :operator
       end

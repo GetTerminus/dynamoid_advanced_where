@@ -1,33 +1,42 @@
+# frozen_string_literal: true
+
+require 'securerandom'
+
 module DynamoidAdvancedWhere
   module Nodes
     class ExistsNode < BaseNode
-      delegate :term, to: :field_node
+      include Concerns::Negatable
 
-      attr_accessor :field_node, :value
-
-      def initialize(field_node: , **args)
-        super(args)
+      attr_accessor :field_node, :prefix
+      def initialize(field_node:)
         self.field_node = field_node
-        self.value = value
+        self.prefix = SecureRandom.hex
       end
 
+      def to_expression
+        "NOT(
+          attribute_not_exists(#{field_node.to_expression})
+          or #{field_node.to_expression} = :#{prefix}
+        )"
+      end
 
-      def to_condition_expression
-         "NOT(attribute_not_exists(##{expression_prefix}) or ##{expression_prefix} = :#{expression_prefix}V2)"
+      def child_nodes
+        [field_node]
       end
 
       def expression_attribute_values
-        { ":#{expression_prefix}V2" => nil }
-      end
-
-      def expression_attribute_names
         {
-          "##{expression_prefix}" => term
+          ":#{prefix}" => nil
         }
       end
+    end
 
-      def dup
-        self.class.new(field_node: field_node, klass: klass)
+    module Concerns
+      module SupportsExistance
+        def exists?
+          ExistsNode.new(field_node: self)
+        end
+        alias present? exists?
       end
     end
   end

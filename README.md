@@ -4,7 +4,7 @@ Dynamoid Advanced where provides a more advanced query structure for selecting,
 and updating records. This is very much a work in progress and functionality is
 being added as it is needed.
 
-## Installation 
+## Installation
 
 Add this line to your application's Gemfile:
 
@@ -15,6 +15,19 @@ gem 'dynamoid_advanced_where'
 And then execute:
 
     $ bundle
+
+## Upgrading
+From pre 1.0
+
+Existence checks have been changed:
+```ruby
+# Old
+Model.where{ field }
+
+# New
+Model.where{ field.exists? }
+```
+
 
 ## Usage
 
