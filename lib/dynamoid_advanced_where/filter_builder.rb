@@ -45,7 +45,7 @@ module DynamoidAdvancedWhere
 
     def expression_filters
       {
-        filter_expression: root_node.to_condition_expression,
+        filter_expression: root_node.to_expression,
         expression_attribute_names: (all_nodes + index_nodes).compact.inject({}) do |hsh, i|
           hsh.merge!(i.expression_attribute_names)
         end,
