@@ -11,11 +11,5 @@ require_relative './nodes/exists_node'
 require_relative './nodes/includes'
 
 require_relative './nodes/greater_than_node'
-require_relative './nodes/date_attr/greater_than_node'
-require_relative './nodes/datetime_attr/greater_than_node'
-require_relative './nodes/number_attr/greater_than_node'
 
 require_relative './nodes/less_than_node'
-require_relative './nodes/date_attr/less_than_node'
-require_relative './nodes/datetime_attr/less_than_node'
-require_relative './nodes/number_attr/less_than_node'

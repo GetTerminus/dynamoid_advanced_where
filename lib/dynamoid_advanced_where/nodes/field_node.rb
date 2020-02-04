@@ -31,14 +31,8 @@ module DynamoidAdvancedWhere
         self.attr_prefix = SecureRandom.hex
       end
 
-      def dup
-        self.class.new(field_name: field_name, klass: klass).tap do |e|
-          e.child_nodes = dup_children
-        end
-      end
-
       def to_expression
-        "##{attr_prefix} "
+        "##{attr_prefix}"
       end
 
       def expression_attribute_names
