@@ -19,8 +19,7 @@ RSpec.describe "Greater Than" do
       expect{
         klass.where{ simple_string > 5}.all
       }.to raise_error(
-        ArgumentError,
-        'Unable to perform greater than on field of type string'
+        NoMethodError
       )
     end
   end
@@ -31,7 +30,7 @@ RSpec.describe "Greater Than" do
         klass.where{ num > '5'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on value of type String'
+        'unable to compare number to `String`'
       )
     end
 
@@ -48,7 +47,7 @@ RSpec.describe "Greater Than" do
         klass.where{ string_date > 1.day.ago}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on value of type Datetime unless stored as an integer'
+        /unable to find field type for/
       )
     end
   end
@@ -62,7 +61,7 @@ RSpec.describe "Greater Than" do
         klass.where{ int_datetime > 'abc'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on datetime with a value of type String. Expected Date or Time'
+        'unable to compare datetime to type String'
       )
     end
 
@@ -88,7 +87,7 @@ RSpec.describe "Greater Than" do
         klass.where{ int_date > 'abc'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform greater than on date with a value of type String. Expected Date'
+        'unable to compare datetime to type String'
       )
     end
 

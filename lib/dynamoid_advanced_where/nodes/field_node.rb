@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative './equality_node'
+require_relative './greater_than_node'
 
 module DynamoidAdvancedWhere
   module Nodes
@@ -15,7 +16,7 @@ module DynamoidAdvancedWhere
           attr_config = klass.attributes[field_name]
           specific_klass = FIELD_MAPPING.detect { |config, type| config <= attr_config }&.last
 
-          raise "unable to find field type for `#{attr_config}`" unless specific_klass
+          raise ArgumentError, "unable to find field type for `#{attr_config}`" unless specific_klass
 
           specific_klass.new(field_name: field_name, klass: klass)
         end
@@ -52,17 +53,64 @@ module DynamoidAdvancedWhere
 
     class StringAttributeNode < FieldNode; end
     class NativeBooleanAttributeNode < FieldNode; end
+
     class StringBooleanAttributeNode < FieldNode
       def parse_right_hand_side(val)
         val ? 't' : 'f'
       end
     end
 
+    class NumberAttributeNode < FieldNode
+      include Concerns::SupportsGreaterThan
+
+      ALLOWED_COMPARISON_TYPES = [
+        Numeric
+      ].freeze
+
+      def parse_right_hand_side(val)
+        unless ALLOWED_COMPARISON_TYPES.detect { |k| val.is_a?(k) }
+          raise ArgumentError, "unable to compare number to `#{val.class}`"
+        end
+
+        val
+      end
+    end
+
+    class NumericDatetimeAttributeNode < FieldNode
+      include Concerns::SupportsGreaterThan
+
+      def parse_right_hand_side(val)
+        if val.is_a?(Date)
+          val.to_time.to_i
+        elsif val.is_a?(Time)
+          val.to_f
+        else
+          raise ArgumentError, "unable to compare datetime to type #{val.class}"
+        end
+      end
+    end
+
+    class NumericDateAttributeNode < NumericDatetimeAttributeNode; end
+
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
-      { type: :boolean, store_as_native_boolean: true } => NativeBooleanAttributeNode,
-      { type: :boolean, store_as_native_boolean: false } => StringBooleanAttributeNode,
-    }.freeze
+      { type: :number } => NumberAttributeNode,
 
+      # Boolean Fields
+      { type: :boolean, store_as_native_boolean: true } =>
+        NativeBooleanAttributeNode,
+      { type: :boolean, store_as_native_boolean: false } =>
+        StringBooleanAttributeNode,
+
+      # Datetime fields
+      { type: :datetime, store_as_string: true } => nil,
+      { type: :datetime, store_as_string: false } => NumericDateAttributeNode,
+      { type: :datetime } => NumericDateAttributeNode,
+
+      # Date fields
+      { type: :date, store_as_string: true } => nil,
+      { type: :date, store_as_string: false } => NumericDateAttributeNode,
+      { type: :date } => NumericDateAttributeNode,
+    }.freeze
   end
 end

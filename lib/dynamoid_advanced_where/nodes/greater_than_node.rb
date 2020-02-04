@@ -1,19 +1,26 @@
 module DynamoidAdvancedWhere
   module Nodes
-    class GreaterThanNode < BaseNode
-      class << self
-        def determine_subtype(attr_config, value)
-          case attr_config[:type]
-          when :number
-            NumberAttr::GreaterThanNode
-          when :datetime
-            DatetimeAttr::GreaterThanNode
-          when :date
-            DateAttr::GreaterThanNode
-          else
-            raise ArgumentError, "Unable to perform greater than on field of type #{attr_config[:type]}"
-          end
+    class GreaterThanNode < OperationNode
+      include Concerns::Negatable
+
+      self.operator = '>'
+    end
+
+    module Concerns
+      module SupportsGreaterThan
+        def gt(other_value)
+          val = if respond_to?(:parse_right_hand_side)
+                  parse_right_hand_side(other_value)
+                else
+                  other_value
+                end
+
+          GreaterThanNode.new(
+            lh_operation: self,
+            rh_operation: LiteralNode.new(val)
+          )
         end
+        alias > gt
       end
     end
   end
