@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module DynamoidAdvancedWhere
   class FilterBuilder
     VALID_COMPARETORS_FOR_RANGE_FILTER = [
-      Nodes::GreaterThanNode,
-    ]
+      Nodes::GreaterThanNode
+    ].freeze
 
     attr_accessor :query_builder, :klass
 
@@ -36,6 +38,7 @@ module DynamoidAdvancedWhere
     end
 
     private
+
     def key_condition_expression
       @key_condition_expression ||= [
         extract_query_filter_node,
@@ -51,8 +54,8 @@ module DynamoidAdvancedWhere
         end,
         expression_attribute_values: (all_nodes + index_nodes).compact.inject({}) do |hsh, i|
           hsh.merge!(i.expression_attribute_values)
-        end,
-      }.delete_if{|_, v| v.nil? || v.empty? }
+        end
+      }.delete_if { |_, v| v.nil? || v.empty? }
     end
 
     def extract_query_filter_node
@@ -60,7 +63,7 @@ module DynamoidAdvancedWhere
         case first_node
         when Nodes::EqualityNode
           if field_node_valid_for_key_filter(first_node)
-            self.query_builder.root_node.child_nodes.delete_at(0)
+            query_builder.root_node.child_nodes.delete_at(0)
           end
         when Nodes::AndNode
           hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
@@ -76,6 +79,7 @@ module DynamoidAdvancedWhere
 
     def extract_range_key_node
       return unless extract_query_filter_node
+
       @range_key_node ||=
         case first_node
         when Nodes::AndNode
@@ -87,11 +91,11 @@ module DynamoidAdvancedWhere
     def field_node_valid_for_range_filter(node)
       node.lh_operation.is_a?(Nodes::FieldNode) &&
         node.lh_operation.field_name.to_s == range_key &&
-        VALID_COMPARETORS_FOR_RANGE_FILTER.any?{|type| node.is_a?(type)  }
+        VALID_COMPARETORS_FOR_RANGE_FILTER.any? { |type| node.is_a?(type) }
     end
 
     def first_node
-      self.query_builder.root_node.child_nodes.first
+      query_builder.root_node.child_nodes.first
     end
 
     def hash_key

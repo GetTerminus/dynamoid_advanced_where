@@ -15,7 +15,7 @@ module DynamoidAdvancedWhere
         end
 
         def batch_update
-          where{}.batch_update
+          advanced_where{}.batch_update
         end
 
         def where(*args, &blk)
