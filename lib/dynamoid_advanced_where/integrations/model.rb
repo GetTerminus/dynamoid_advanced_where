@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dynamoid_advanced_where/query_builder'
 
 module DynamoidAdvancedWhere
@@ -8,27 +10,20 @@ module DynamoidAdvancedWhere
 
       class_methods do
         def advanced_where(&blk)
-          DynamoidAdvancedWhere::QueryBuilder.new(
-            klass: self,
-            &blk
-          )
+          DynamoidAdvancedWhere::QueryBuilder.new(klass: self, &blk)
         end
 
         def batch_update
-          advanced_where{}.batch_update
+          advanced_where {}.batch_update
         end
 
         def where(*args, &blk)
-          if args.length > 0
-            if blk
-              raise ArgumentError, "You may not specify where arguments and block"
-            end
+          if !args.empty?
+            raise ArgumentError, 'You may not specify where arguments and block' if blk
+
             super(*args)
           else
-            DynamoidAdvancedWhere::QueryBuilder.new(
-              klass: self,
-              &blk
-            )
+            DynamoidAdvancedWhere::QueryBuilder.new(klass: self, &blk)
           end
         end
       end
