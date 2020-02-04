@@ -5,7 +5,7 @@ module DynamoidAdvancedWhere
 
       def initialize(klass:, &blk)
         self.klass = klass
-        evaluate_block(blk)
+        evaluate_block(blk) if blk
       end
 
       def evaluate_block(blk)
@@ -33,18 +33,6 @@ module DynamoidAdvancedWhere
       def allowed_field?(method)
         klass.attributes.key?(method.to_sym)
       end
-
-      # def combine_with!(other_root_node, combinator)
-      #   new_child = create_subnode(combinator).tap do |new_node|
-      #     new_node.child_nodes = (
-      #       self.child_nodes + other_root_node.child_nodes
-      #     ).compact
-      #   end
-
-      #   new_child.flatten_tree!
-
-      #   self.child_nodes = [new_child]
-      # end
     end
   end
 end

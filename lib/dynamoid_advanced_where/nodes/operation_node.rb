@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 require_relative './not'
+require_relative './and_node'
+require_relative './or_node'
 
 module DynamoidAdvancedWhere
   module Nodes
     class OperationNode < BaseNode
       include Concerns::Negatable
+      include Concerns::SupportsLogicalAnd
+      include Concerns::SupportsLogicalOr
 
       class << self
         attr_accessor :operator

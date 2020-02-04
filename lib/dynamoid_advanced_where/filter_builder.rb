@@ -40,7 +40,7 @@ module DynamoidAdvancedWhere
       @key_condition_expression ||= [
         extract_query_filter_node,
         extract_range_key_node
-      ].compact.map(&:to_condition_expression).join(' AND ')
+      ].compact.map(&:to_expression).join(' AND ')
     end
 
     def expression_filters
@@ -58,22 +58,20 @@ module DynamoidAdvancedWhere
     def extract_query_filter_node
       @query_filter_node ||=
         case first_node
-        when Nodes::FieldNode
+        when Nodes::EqualityNode
           if field_node_valid_for_key_filter(first_node)
             self.query_builder.root_node.child_nodes.delete_at(0)
           end
         when Nodes::AndNode
-          if first_node.negated? == false
-            hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
-            first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
-          end
+          hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
+          first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
         end
     end
 
-    def field_node_valid_for_key_filter(field_node)
-      field_node.is_a?(Nodes::FieldNode) &&
-        field_node.term.to_s == hash_key &&
-        field_node.child_nodes.is_a?(Nodes::EqualityNode)
+    def field_node_valid_for_key_filter(node)
+      node.is_a?(Nodes::EqualityNode) &&
+        node.lh_operation.is_a?(Nodes::FieldNode) &&
+        node.lh_operation.field_name.to_s == hash_key
     end
 
     def extract_range_key_node
@@ -81,15 +79,15 @@ module DynamoidAdvancedWhere
       @range_key_node ||=
         case first_node
         when Nodes::AndNode
-          if first_node.negated? == false
-            hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_range_filter))
-            first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
-          end
+          hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_range_filter))
+          first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
         end
     end
 
-    def field_node_valid_for_range_filter(field_node)
-      field_node.term.to_s == range_key && VALID_COMPARETORS_FOR_RANGE_FILTER.any?{|type| field_node.child_nodes.is_a?(type)  }
+    def field_node_valid_for_range_filter(node)
+      node.lh_operation.is_a?(Nodes::FieldNode) &&
+        node.lh_operation.field_name.to_s == range_key &&
+        VALID_COMPARETORS_FOR_RANGE_FILTER.any?{|type| node.is_a?(type)  }
     end
 
     def first_node

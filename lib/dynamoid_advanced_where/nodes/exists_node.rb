@@ -20,8 +20,8 @@ module DynamoidAdvancedWhere
         )"
       end
 
-      def child_nodes
-        [field_node]
+      def expression_attribute_names
+        field_node.expression_attribute_names
       end
 
       def expression_attribute_values
