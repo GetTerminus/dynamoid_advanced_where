@@ -4,6 +4,7 @@ require_relative './equality_node'
 require_relative './greater_than_node'
 require_relative './exists_node'
 require_relative './includes'
+require_relative '../subfield'
 
 module DynamoidAdvancedWhere
   module Nodes
@@ -121,6 +122,10 @@ module DynamoidAdvancedWhere
       end
     end
 
+    class MapAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
+    end
+
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
       { type: :number } => NumberAttributeNode,
@@ -144,6 +149,9 @@ module DynamoidAdvancedWhere
       # Set Types
       { type: :set, of: :string } => StringSetAttributeNode,
       { type: :set, of: :integer } => IntegerSetAttributeNode,
+
+      # Map Types
+      { type: :map } => MapAttributeNode,
     }.freeze
   end
 end

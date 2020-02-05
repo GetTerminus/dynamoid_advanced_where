@@ -48,6 +48,7 @@ module DynamoidAdvancedWhere
       query = {
         table_name: table_name
       }.merge(filter_builder.to_scan_filter)
+      binding.pry
 
       results = client.scan(query)
 
