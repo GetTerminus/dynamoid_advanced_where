@@ -36,8 +36,8 @@ module DynamoidAdvancedWhere
       local_root_node = root_node
       self.class.new(klass: klass) do
         Nodes::AndNode.new(
-          *other_builder.root_node.child_nodes,
-          *local_root_node.child_nodes
+          other_builder.root_node.child_node,
+          local_root_node.child_node
         )
       end
     end
