@@ -13,7 +13,7 @@ RSpec.describe "Combining multiple queries with &" do
   let!(:instance3) { klass.create(simple_string: 'a', second_string: 'd') }
   let!(:instance4) { klass.create(simple_string: 'a') }
 
-  let!(:base_filter) { klass.where{ simple_string == 'a' } }
+  let!(:base_filter) { klass.where{|r| r.simple_string == 'a' } }
 
   after do
     # It should not modify the initial filter
@@ -37,7 +37,7 @@ RSpec.describe "Combining multiple queries with &" do
 
     it "combines existence nodes" do
       expect(
-        klass.where{ !second_string.exists? }.and(base_filter).all
+        klass.where{|r| !r.second_string.exists? }.and(base_filter).all
       ).to eq [instance4]
     end
 

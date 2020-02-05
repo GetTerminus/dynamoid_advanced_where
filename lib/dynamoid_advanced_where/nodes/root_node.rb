@@ -1,21 +1,28 @@
+# frozen_string_literal: true
+
+require 'forwardable'
+require_relative './null_node'
+
 module DynamoidAdvancedWhere
   module Nodes
     class RootNode < BaseNode
-      attr_accessor :klass
+      extend Forwardable
+      attr_accessor :klass, :child_node
+
+      #def_delegators :@child_node,
+      #               :expression_attribute_names,
+      #               :expression_attribute_values,
+      #               :to_expression
 
       def initialize(klass:, &blk)
         self.klass = klass
         evaluate_block(blk) if blk
+        self.child_node ||= NullNode.new
+        freeze
       end
 
       def evaluate_block(blk)
-        self.child_nodes = [
-          self.instance_eval(&blk)
-        ].compact
-      end
-
-      def to_expression
-        child_nodes.first.to_expression if child_nodes.length.positive?
+        self.child_node = instance_eval(&blk)
       end
 
       def method_missing(method, *args, &blk)
