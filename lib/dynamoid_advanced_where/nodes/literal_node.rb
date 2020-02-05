@@ -9,6 +9,7 @@ module DynamoidAdvancedWhere
       def initialize(value)
         self.value = value
         self.attr_prefix = SecureRandom.hex
+        freeze
       end
 
       def to_expression

@@ -6,12 +6,7 @@ module DynamoidAdvancedWhere
       def initialize(klass:, &blk)
         self.klass = klass
         evaluate_block(blk) if blk
-      end
-
-      def evaluate_block(blk)
-        self.child_nodes = [
-          self.instance_eval(&blk)
-        ].compact
+        freeze
       end
 
       def to_expression
@@ -32,6 +27,13 @@ module DynamoidAdvancedWhere
 
       def allowed_field?(method)
         klass.attributes.key?(method.to_sym)
+      end
+
+      private
+      def evaluate_block(blk)
+        self.child_nodes = [
+          self.instance_eval(&blk)
+        ].compact
       end
     end
   end

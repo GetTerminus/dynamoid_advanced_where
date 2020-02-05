@@ -7,7 +7,8 @@ module DynamoidAdvancedWhere
       attr_accessor :child_nodes
 
       def initialize(*child_nodes)
-        self.child_nodes = child_nodes
+        self.child_nodes = child_nodes.freeze
+        freeze
       end
 
       def to_expression
@@ -21,7 +22,7 @@ module DynamoidAdvancedWhere
       end
 
       def and(other_value)
-        child_nodes << other_value
+        AndNode.new(other_value, *child_nodes)
       end
       alias & and
     end

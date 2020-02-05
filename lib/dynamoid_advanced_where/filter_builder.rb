@@ -66,8 +66,8 @@ module DynamoidAdvancedWhere
             query_builder.root_node.child_nodes.delete_at(0)
           end
         when Nodes::AndNode
-          hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
-          first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
+          hash_node_idx = first_node_children.index(&method(:field_node_valid_for_key_filter))
+          first_node_children.delete_at(hash_node_idx) if hash_node_idx
         end
     end
 
@@ -83,9 +83,13 @@ module DynamoidAdvancedWhere
       @range_key_node ||=
         case first_node
         when Nodes::AndNode
-          hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_range_filter))
-          first_node.child_nodes.delete_at(hash_node_idx) if hash_node_idx
+          hash_node_idx = first_node_children.index(&method(:field_node_valid_for_range_filter))
+          first_node_children.delete_at(hash_node_idx) if hash_node_idx
         end
+    end
+
+    def first_node_children
+      @first_node_children ||= first_node.child_nodes.dup
     end
 
     def field_node_valid_for_range_filter(node)
