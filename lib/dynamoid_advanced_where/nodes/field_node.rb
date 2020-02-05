@@ -124,6 +124,10 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsSubFields
     end
 
+    class RawAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
+    end
+
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
       { type: :number } => NumberAttributeNode,
@@ -150,6 +154,9 @@ module DynamoidAdvancedWhere
 
       # Map Types
       { type: :map } => MapAttributeNode,
+
+      # Raw Types
+      { type: :raw } => RawAttributeNode,
     }.freeze
   end
 end
