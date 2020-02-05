@@ -19,7 +19,7 @@ RSpec.describe "Attribute Existance" do
       klass2.create
 
       expect(
-        klass.where{ simple_string }.all
+        klass.where{ simple_string.exists? }.all
       ).to match_array [item1]
     end
 
@@ -30,7 +30,7 @@ RSpec.describe "Attribute Existance" do
       item2 = klass2.create
 
       expect(
-        klass.where{ !simple_string }.all
+        klass.where{ !simple_string.exists? }.all
       ).to match_array [item1, item2]
     end
 
@@ -40,7 +40,7 @@ RSpec.describe "Attribute Existance" do
       klass2.create
 
       expect(
-        klass.where{ (other_simple_string == 'bar') & (!simple_string) }.all
+        klass.where{ (other_simple_string == 'bar') & (!simple_string.exists?) }.all
       ).to match_array [item1]
     end
   end

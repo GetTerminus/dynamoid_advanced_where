@@ -37,7 +37,7 @@ RSpec.describe "Combining multiple queries with &" do
 
     it "combines existence nodes" do
       expect(
-        klass.where{ !second_string }.and(base_filter).all
+        klass.where{ !second_string.exists? }.and(base_filter).all
       ).to eq [instance4]
     end
 

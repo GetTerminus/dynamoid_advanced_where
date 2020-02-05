@@ -13,7 +13,7 @@ RSpec.describe "Upserting" do
 
     it "performs the 'sert' side of upsert" do
       expect(
-        klass.where{ !simple_string }.upsert(
+        klass.where{ !simple_string.exists? }.upsert(
           id,
           simple_string: 'hi',
           string_date: 1.day.ago,
@@ -67,7 +67,7 @@ RSpec.describe "Upserting" do
 
     it "performs the 'sert' side of upsert" do
       expect(
-        klass.where{ !simple_string }.upsert(id, 5, simple_string: 'hi')
+        klass.where{ !simple_string.exists? }.upsert(id, 5, simple_string: 'hi')
       ).to be_a_kind_of(klass).and have_attributes(numb_a: 5, simple_string: 'hi')
     end
 

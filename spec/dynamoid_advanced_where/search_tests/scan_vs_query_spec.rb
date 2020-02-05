@@ -81,7 +81,7 @@ RSpec.describe 'Scan vs Query' do
       query_mat = default_klass.where{ (id == 'a') & (bar > 1) }.query_materializer
 
       expect(query_mat.send(:client)).to receive(:query).with(a_hash_including(
-        key_condition_expression: a_string_matching(/#[^ ]+ > :[^ ]+/)
+        key_condition_expression: a_string_matching(/#[^ ]+ +> +:[^ ]+/)
       )).and_call_original
 
       expect(query_mat.each.to_a.length).to eq 1

@@ -18,10 +18,7 @@ RSpec.describe "Less Than" do
     it "raises an error" do
       expect{
         klass.where{ simple_string < 5}.all
-      }.to raise_error(
-        ArgumentError,
-        'Unable to perform less than on field of type string'
-      )
+      }.to raise_error(NoMethodError)
     end
   end
 
@@ -31,7 +28,7 @@ RSpec.describe "Less Than" do
         klass.where{ num < '5'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on value of type String'
+        'unable to compare number to `String`'
       )
     end
 
@@ -48,7 +45,7 @@ RSpec.describe "Less Than" do
         klass.where{ string_datetime < 1.day.ago}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on value of type Datetime unless stored as an integer'
+        /unable to find field type for/
       )
     end
   end
@@ -62,7 +59,7 @@ RSpec.describe "Less Than" do
         klass.where{ int_datetime < 'abc'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on datetime with a value of type String. Expected Date or Time'
+        'unable to compare datetime to type String'
       )
     end
 
@@ -85,7 +82,7 @@ RSpec.describe "Less Than" do
         klass.where{ str_date < 1.day.ago.to_date}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on value of type Date unless stored as an integer'
+        /unable to find field type for/
       )
     end
   end
@@ -99,7 +96,7 @@ RSpec.describe "Less Than" do
         klass.where{ int_date < 'abc'}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on date with a value of type String. Expected Date'
+        /unable to compare date to type String/
       )
     end
 
@@ -108,7 +105,7 @@ RSpec.describe "Less Than" do
         klass.where{ int_date < DateTime.now}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on date with a value of type DateTime. Expected Date'
+        /unable to compare date to type DateTime/
       )
     end
 
@@ -117,7 +114,7 @@ RSpec.describe "Less Than" do
         klass.where{ int_date < Time.now}.all
       }.to raise_error(
         ArgumentError,
-        'Unable to perform less than on date with a value of type Time. Expected Date'
+        'unable to compare date to type Time'
       )
     end
 

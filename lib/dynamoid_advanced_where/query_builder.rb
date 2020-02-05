@@ -7,7 +7,6 @@ module DynamoidAdvancedWhere
     attr_accessor :klass, :root_node
 
     delegate :all, :each, to: :query_materializer
-    delegate :combine_with!, to: :root_node
 
     def initialize(klass:, &blk)
       self.klass = klass
@@ -28,18 +27,21 @@ module DynamoidAdvancedWhere
     end
 
     def where(other_builder = nil, &blk)
-      raise "cannot use a block and an argument" if other_builder && blk
+      raise 'cannot use a block and an argument' if other_builder && blk
 
       other_builder = self.class.new(klass: klass, &blk) if blk
 
-      raise "passed argument must be a query builder" unless other_builder.is_a?(self.class)
+      raise 'passed argument must be a query builder' unless other_builder.is_a?(self.class)
 
-      dup.tap{|q| q.combine_with!(other_builder.root_node, Nodes::AndNode) }
+      local_root_node = root_node
+      self.class.new(klass: klass) do
+        Nodes::AndNode.new(
+          *other_builder.root_node.child_nodes,
+          *local_root_node.child_nodes
+        )
+      end
     end
     alias and where
 
-    def dup
-      self.class.new(klass: klass).tap{|b| b.root_node = root_node.dup }
-    end
   end
 end

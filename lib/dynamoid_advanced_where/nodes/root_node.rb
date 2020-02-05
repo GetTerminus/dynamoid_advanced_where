@@ -1,26 +1,37 @@
 module DynamoidAdvancedWhere
   module Nodes
     class RootNode < BaseNode
+      attr_accessor :klass
+
+      def initialize(klass:, &blk)
+        self.klass = klass
+        evaluate_block(blk) if blk
+      end
+
       def evaluate_block(blk)
         self.child_nodes = [
           self.instance_eval(&blk)
         ].compact
       end
 
-      def to_condition_expression
-        child_nodes.first.to_condition_expression unless child_nodes.empty?
+      def to_expression
+        child_nodes.first.to_expression if child_nodes.length.positive?
       end
 
-      def combine_with!(other_root_node, combinator)
-        new_child = create_subnode(combinator).tap do |new_node|
-          new_node.child_nodes = (
-            self.child_nodes + other_root_node.child_nodes
-          ).compact
+      def method_missing(method, *args, &blk)
+        if allowed_field?(method)
+          FieldNode.create_node(klass: klass, field_name: method)
+        else
+          super
         end
+      end
 
-        new_child.flatten_tree!
+      def respond_to_missing?(method, _i)
+        allowed_field?(method)
+      end
 
-        self.child_nodes = [new_child]
+      def allowed_field?(method)
+        klass.attributes.key?(method.to_sym)
       end
     end
   end

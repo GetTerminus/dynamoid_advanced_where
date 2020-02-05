@@ -1,57 +1,28 @@
 module DynamoidAdvancedWhere
   module Nodes
-    class IncludesNode < BaseNode
-      ALLOWED_VALUES = [
-        String,
-        Integer
-      ].freeze
+    class IncludesNode < OperationNode
+      def to_expression
+        "contains(
+          #{lh_operation.to_expression},
+          #{rh_operation.to_expression}
+        )"
+      end
+    end
 
-      ALLOWED_SET_TYPES = %i[
-        string
-        integer
-      ].freeze
+    module Concerns
+      module SupportsIncludes
+        def includes?(other_value)
+          val = if respond_to?(:parse_right_hand_side)
+                  parse_right_hand_side(other_value)
+                else
+                  other_value
+                end
 
-      class << self
-        def validate_source_node(attr_config, value)
-          unless ALLOWED_VALUES.include?(value.class)
-            raise ArgumentError,
-                  "Unable to do an include check against #{value.class}"
-          end
-
-          result = attr_config[:type] == :string || (
-            attr_config[:type] == :set &&
-            ALLOWED_SET_TYPES.include?(attr_config[:of])
+          IncludesNode.new(
+            lh_operation: self,
+            rh_operation: LiteralNode.new(val)
           )
-
-          result || raise(ArgumentError, 'Unable to perform includes on field')
         end
-      end
-
-      delegate :term, to: :term_node
-
-      attr_accessor :term_node, :value
-
-      def initialize(term_node:, value:, **args)
-        super(args)
-
-        self.term_node = term_node
-        self.value = value
-      end
-
-      def to_condition_expression
-        "contains(##{expression_prefix}, :#{expression_prefix}V)"
-      end
-
-      def expression_attribute_names
-        {
-          "##{expression_prefix}" => term
-        }
-      end
-
-      def expression_attribute_values
-        {
-          ":#{expression_prefix}V" => value
-        }
       end
     end
   end
