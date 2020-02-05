@@ -117,10 +117,6 @@ module DynamoidAdvancedWhere
         end
     end
 
-    def first_node_children
-      @first_node_children ||= first_node.child_nodes.dup
-    end
-
     def field_node_valid_for_range_filter(node)
       node.lh_operation.is_a?(Nodes::FieldNode) &&
         node.lh_operation.field_name.to_s == range_key &&
