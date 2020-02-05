@@ -8,10 +8,10 @@ module DynamoidAdvancedWhere
       extend Forwardable
 
       attr_accessor :sub_node
+
       def_delegators :@sub_node,
                      :expression_attribute_names,
-                     :expression_attribute_values,
-                     :all_nodes
+                     :expression_attribute_values
 
       def initialize(sub_node:)
         self.sub_node = sub_node

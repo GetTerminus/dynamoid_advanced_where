@@ -1,9 +1,17 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 module DynamoidAdvancedWhere
   module Nodes
-    class BaseNode
-      attr_accessor :expression_prefix
+    class NullNode
+      def initialize
+        freeze
+      end
+
+      def to_expression
+        ''
+      end
 
       def expression_attribute_names
         {}
@@ -15,4 +23,3 @@ module DynamoidAdvancedWhere
     end
   end
 end
-

@@ -1,7 +1,13 @@
+# frozen_string_literal: true
+
+require 'forwardable'
+require_relative './null_node'
+
 module DynamoidAdvancedWhere
   module Nodes
     class RootNode < BaseNode
-      attr_accessor :klass
+      extend Forwardable
+      attr_accessor :klass, :child_node
 
       def initialize(klass:, &blk)
         self.klass = klass
@@ -9,8 +15,13 @@ module DynamoidAdvancedWhere
         freeze
       end
 
-      def to_expression
-        child_nodes.first.to_expression if child_nodes.length.positive?
+      def evaluate_block(blk)
+        self.child_node = if blk.arity.zero?
+                         Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
+                         instance_eval(&blk)
+                       else
+                         blk.call(self)
+                       end
       end
 
       def method_missing(method, *args, &blk)

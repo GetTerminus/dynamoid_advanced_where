@@ -15,8 +15,12 @@ module DynamoidAdvancedWhere
         "(#{child_nodes.map(&:to_expression).join(') or (')})"
       end
 
-      def all_nodes
-        [self] + child_nodes
+      def expression_attribute_names
+        child_nodes.map(&:expression_attribute_names).inject({}, &:merge!)
+      end
+
+      def expression_attribute_values
+        child_nodes.map(&:expression_attribute_values).inject({}, &:merge!)
       end
 
       def or(other_value)
