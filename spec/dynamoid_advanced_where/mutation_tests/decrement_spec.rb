@@ -72,7 +72,7 @@ RSpec.describe "decrement batch" do
           .apply(id2)
       }.to change {
         record2.reload.attributes.slice(:numb_a, :numb_b).values
-      }.from([nil, nil]).to([-5, -5])
+      }.from([]).to([-5, -5])
     end
   end
 end
