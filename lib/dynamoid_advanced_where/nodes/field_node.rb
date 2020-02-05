@@ -4,7 +4,7 @@ require_relative './equality_node'
 require_relative './greater_than_node'
 require_relative './exists_node'
 require_relative './includes'
-require_relative '../subfield'
+require_relative './subfield'
 
 module DynamoidAdvancedWhere
   module Nodes
@@ -12,40 +12,38 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsEquality
       include Concerns::SupportsExistance
 
-      attr_accessor :klass, :field_name, :attr_prefix
+      attr_accessor :field_path, :attr_prefix
 
       class << self
-        def create_node(klass:, field_name:)
-          attr_config = klass.attributes[field_name]
+        def create_node(field_path:, attr_config:)
           specific_klass = FIELD_MAPPING.detect { |config, type| config <= attr_config }&.last
 
           raise ArgumentError, "unable to find field type for `#{attr_config}`" unless specific_klass
 
-          specific_klass.new(field_name: field_name, klass: klass)
+          specific_klass.new(field_path: field_path)
         end
       end
 
-      def initialize(field_name:, klass:)
-        self.field_name = field_name
-        self.klass = klass
+      def initialize(field_path:)
+        self.field_path = field_path.is_a?(Array) ? field_path : [field_path]
         self.attr_prefix = SecureRandom.hex
         freeze
       end
 
       def to_expression
-        "##{attr_prefix}"
+        field_path.collect.with_index do |_, i|
+          "##{attr_prefix}#{i}"
+        end.join('.')
       end
 
       def expression_attribute_names
-        { "##{attr_prefix}" => field_name }
+        field_path.each_with_object({}).with_index do |(segment, hsh), i|
+          hsh["##{attr_prefix}#{i}"] = segment
+        end
       end
 
       def expression_attribute_values
         {}
-      end
-
-      def attr_config
-        klass.attributes[field_name]
       end
     end
 

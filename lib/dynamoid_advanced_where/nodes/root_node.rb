@@ -18,7 +18,7 @@ module DynamoidAdvancedWhere
 
       def method_missing(method, *args, &blk)
         if allowed_field?(method)
-          FieldNode.create_node(klass: klass, field_name: method)
+          FieldNode.create_node(attr_config: klass.attributes[method], field_path: method)
         else
           super
         end
