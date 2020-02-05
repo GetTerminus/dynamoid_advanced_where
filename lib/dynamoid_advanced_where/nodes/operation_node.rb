@@ -20,14 +20,7 @@ module DynamoidAdvancedWhere
       def initialize(lh_operation:, rh_operation:)
         self.lh_operation = lh_operation
         self.rh_operation = rh_operation
-      end
-
-      def dup
-        self.class.new(
-          lh_operation: lh_operation,
-          rh_operation: rh_operation,
-          klass: klass
-        )
+        freeze
       end
 
       def to_expression

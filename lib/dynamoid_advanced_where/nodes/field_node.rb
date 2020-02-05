@@ -7,7 +7,6 @@ require_relative './includes'
 
 module DynamoidAdvancedWhere
   module Nodes
-
     class FieldNode < BaseNode
       include Concerns::SupportsEquality
       include Concerns::SupportsExistance
@@ -29,6 +28,7 @@ module DynamoidAdvancedWhere
         self.field_name = field_name
         self.klass = klass
         self.attr_prefix = SecureRandom.hex
+        freeze
       end
 
       def to_expression

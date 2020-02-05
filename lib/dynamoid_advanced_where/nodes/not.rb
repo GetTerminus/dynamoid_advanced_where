@@ -15,6 +15,7 @@ module DynamoidAdvancedWhere
 
       def initialize(sub_node:)
         self.sub_node = sub_node
+        freeze
       end
 
       def to_expression

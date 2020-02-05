@@ -11,6 +11,7 @@ module DynamoidAdvancedWhere
       def initialize(field_node:)
         self.field_node = field_node
         self.prefix = SecureRandom.hex
+        freeze
       end
 
       def to_expression

@@ -16,15 +16,6 @@ module DynamoidAdvancedWhere
         freeze
       end
 
-      def evaluate_block(blk)
-        self.child_node = if blk.arity.zero?
-                         Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
-                         instance_eval(&blk)
-                       else
-                         blk.call(self)
-                       end
-      end
-
       def method_missing(method, *args, &blk)
         if allowed_field?(method)
           FieldNode.create_node(klass: klass, field_name: method)
@@ -39,6 +30,17 @@ module DynamoidAdvancedWhere
 
       def allowed_field?(method)
         klass.attributes.key?(method.to_sym)
+      end
+
+      private
+
+      def evaluate_block(blk)
+        self.child_node = if blk.arity.zero?
+                            Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
+                            instance_eval(&blk)
+                          else
+                            blk.call(self)
+                       end
       end
     end
   end
