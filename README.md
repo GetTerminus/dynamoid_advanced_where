@@ -31,7 +31,7 @@ end
 # with a single argument
 
 Model.where do |r|
-  r.field == local
+  r.field == getValue(123)
 end
 ```
 
