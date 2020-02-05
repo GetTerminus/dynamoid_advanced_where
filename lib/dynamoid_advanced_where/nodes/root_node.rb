@@ -9,11 +9,6 @@ module DynamoidAdvancedWhere
       extend Forwardable
       attr_accessor :klass, :child_node
 
-      #def_delegators :@child_node,
-      #               :expression_attribute_names,
-      #               :expression_attribute_values,
-      #               :to_expression
-
       def initialize(klass:, &blk)
         self.klass = klass
         evaluate_block(blk) if blk
@@ -22,7 +17,12 @@ module DynamoidAdvancedWhere
       end
 
       def evaluate_block(blk)
-        self.child_node = instance_eval(&blk)
+        self.child_node = if blk.arity.zero?
+                         Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
+                         instance_eval(&blk)
+                       else
+                         blk.call(self)
+                       end
       end
 
       def method_missing(method, *args, &blk)
