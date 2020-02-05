@@ -6,13 +6,12 @@ module DynamoidAdvancedWhere
       Nodes::GreaterThanNode
     ].freeze
 
-    attr_accessor :query_builder, :klass
+    attr_accessor :root_node, :klass
 
-    delegate :root_node, to: :query_builder
     delegate :all_nodes, to: :root_node
 
-    def initialize(query_builder:, klass:)
-      self.query_builder = query_builder
+    def initialize(root_node:, klass:)
+      self.root_node = root_node
       self.klass = klass
     end
 
@@ -63,7 +62,7 @@ module DynamoidAdvancedWhere
         case first_node
         when Nodes::EqualityNode
           if field_node_valid_for_key_filter(first_node)
-            query_builder.root_node.child_nodes.delete_at(0)
+            root_node.child_nodes.delete_at(0)
           end
         when Nodes::AndNode
           hash_node_idx = first_node.child_nodes.index(&method(:field_node_valid_for_key_filter))
@@ -95,15 +94,15 @@ module DynamoidAdvancedWhere
     end
 
     def first_node
-      query_builder.root_node.child_nodes.first
+      root_node.child_nodes.first
     end
 
     def hash_key
-      @hash_key ||= query_builder.klass.hash_key.to_s
+      @hash_key ||= klass.hash_key.to_s
     end
 
     def range_key
-      @range_key ||= query_builder.klass.range_key.to_s
+      @range_key ||= klass.range_key.to_s
     end
   end
 end

@@ -60,7 +60,7 @@ module DynamoidAdvancedWhere
 
     def filter_builder
       @filter_builder ||= FilterBuilder.new(
-        query_builder: self.query_builder,
+        root_node: query_builder.root_node,
         klass: klass,
       )
     end
