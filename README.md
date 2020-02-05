@@ -21,7 +21,7 @@ From pre 1.0
 
 New where block format:
 ```
-# Previously you had to do this to get access to certina scoped variables
+# Previously you had to do this to get access to certain scoped variables
 local = getValue(123)
 Model.where do
   field == local
