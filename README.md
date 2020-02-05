@@ -19,15 +19,30 @@ And then execute:
 ## Upgrading
 From pre 1.0
 
+New where block format:
+```
+# Previously you had to do this to get access to certina scoped variables
+local = getValue(123)
+Model.where do
+  field == local
+end
+
+# This is annoying, the new search block has deprecated the argument-less block, and now should be called
+# with a single argument
+
+Model.where do |r|
+  r.field == local
+end
+```
+
 Existence checks have been changed:
 ```ruby
 # Old
-Model.where{ field }
+Model.where{|r| r.field }
 
 # New
-Model.where{ field.exists? }
+Model.where{|r| r.field.exists? }
 ```
-
 
 ## Usage
 
@@ -44,12 +59,12 @@ class Foo
 end
 
 # Returns all records with `bar` equal to 'hello'
-Foo.where{ bar == 'hello' }.all
+Foo.where{|r| r.bar == 'hello' }.all
 
 # Advanced boolean logic is also supported
 
 # Returns all records with `bar` equal to 'hello' and `baz` equal to 'dude'
-x = Foo.where{ (baz == 'dude') & (bar == 'hello') }.all
+x = Foo.where{|r| (r.baz == 'dude') & (r.bar == 'hello') }.all
 ```
 
 **Note:** Those `()` are required, you do remember your [operator precedence](https://ruby-doc.org/core-2.2.0/doc/syntax/precedence_rdoc.html)
@@ -66,7 +81,7 @@ Checks to see if a field is defined. See [attribute_exists](https://docs.aws.ama
 Valid on field types: `any`
 
 #### Example
-`where{ foo }` or `where{ foo.exists! }`
+`where{|r| r.foo }` or `where{|r| r.foo.exists! }`
 
 ### Value Equality
 The equality of a field can be tested using `==` and not equals tested using `!=`
@@ -74,7 +89,7 @@ The equality of a field can be tested using `==` and not equals tested using `!=
 Valid on field types: `string`
 
 #### Example
-`where{ foo == 'bar' }` and `where{ foo != 'bar' }`
+`where{|r| r.foo == 'bar' }` and `where{|r| r.foo != 'bar' }`
 
 ### Less than
 The less than for a field can be tested using `<`
@@ -82,7 +97,7 @@ The less than for a field can be tested using `<`
 Valid on field types: `numeric`, and `datetime` (only when stored as a number)
 
 #### Example
-`where{ foo < 123 }` and `where{ foo < Date.today }`
+`where{|r| r.foo < 123 }` and `where{|r| r.foo < Date.today }`
 
 ### Includes
 This operator may be used to check if:
@@ -93,15 +108,15 @@ This operator may be used to check if:
 Valid on field types: `string`, or `set` of `String` / `Integer`
 
 #### Example
-`where{ foo.includes?(123) }` and `where{ foo.includes?('foo') }`
+`where{|r| r.foo.includes?(123) }` and `where{|r| r.foo.includes?('foo') }`
 
 ### Boolean Operators
 
 | Logical Operator | Behavior      | Example
 | -------------    | ------------- | --------
-| `&`              | and           | `where{ (foo == 'bar') & (baz == 'nitch') }`
-| <code>&#124;</code>           | or            | <code>where{ (foo == 'bar') &#124; (baz == 'nitch') }</code>
-| `!`              | negation      | `where{ !( (foo == 'bar') & (baz == 'nitch')) }`
+| `&`              | and           | `where{|r| (r.foo == 'bar') & (r.baz == 'nitch') }`
+| <code>&#124;</code>           | or            | <code>where{|r| (r.foo == 'bar') &#124; (r.baz == 'nitch') }</code>
+| `!`              | negation      | `where{ !( (r.foo == 'bar') & (r.baz == 'nitch')) }`
 
 ## Retrieving Records
 Retrieving a pre-filtered set of records is a fairly obvious use case for the
@@ -131,14 +146,14 @@ exact equality. DAW will examine the boolean logic to determine if a key
 condition may be extracted. For example, a query will be performed in the
 following examples:
 
-* `where{ id == '123' }`
-* `where{ (id == '123') & (bar == 'baz') }`
+* `where{|r| r.id == '123' }`
+* `where{|r| (r.id == '123') & (r.bar == 'baz') }`
 
 But it will not be performed in these scenarios
 
-* `where{ id != '123' }`
-* `where{ !(id == '123') }`
-* <code>where{ (id == '123') &#124; (bar == 'baz') }</code>
+* `where{|r| r.id != '123' }`
+* `where{|r| !(r.id == '123') }`
+* <code>where{ (r.id == '123') &#124; (r.bar == 'baz') }</code>
 
 ## Combination of Filters
 Multiple DAW filters can be combined. This will provides the ability to compose
@@ -153,13 +168,13 @@ class Foo
   field :baz
 end
 
-filter1 = Foo.where{ bar == 'abcd' }
-filter2 = Foo.where{ baz == 'dude' }
+filter1 = Foo.where{|r| r.bar == 'abcd' }
+filter2 = Foo.where{|r| r.baz == 'dude' }
 
 # All of these produce the same results
 combination1 = filter1.where(filter2)
 combination2 = filter1.and(filter2)
-combination3 = filter1.where{ baz == 'dude' }
+combination3 = filter1.where{|r| r.baz == 'dude' }
 ```
 
 ## Mutating Records
@@ -203,11 +218,11 @@ end
 
 item = Foo.create(a_number: 5, a_string: 'bar')
 
-Foo.where{ a_number > 5 }.upsert(item.id, a_string: 'dude')
+Foo.where{|r| r.a_number > 5 }.upsert(item.id, a_string: 'dude')
 
 item.reload.a_string # => 'bar'
 
-Foo.where{ a_number > 4 }.upsert(item.id, a_string: 'wassup')
+Foo.where{|r| r.a_number > 4 }.upsert(item.id, a_string: 'wassup')
 
 item.reload.a_string # => 'wassup'
 ```

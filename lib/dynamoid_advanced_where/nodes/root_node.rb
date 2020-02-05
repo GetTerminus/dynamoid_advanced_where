@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DynamoidAdvancedWhere
   module Nodes
     class RootNode < BaseNode
@@ -9,9 +11,14 @@ module DynamoidAdvancedWhere
       end
 
       def evaluate_block(blk)
-        self.child_nodes = [
-          self.instance_eval(&blk)
-        ].compact
+        child_blocks = if blk.arity.zero?
+                         Dynamoid.logger.warn 'Using DynamoidAdvancedWhere builder without an argument is now deprecated'
+                         instance_eval(&blk)
+                       else
+                         blk.call(self)
+                       end
+
+        self.child_nodes = [child_blocks].compact
       end
 
       def to_expression
