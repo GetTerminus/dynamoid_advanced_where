@@ -12,7 +12,7 @@ PATH
   remote: .
   specs:
     dynamoid-advanced-where (0.1.0)
-      dynamoid (~> 3)
+      dynamoid (>= 3.2, < 4)
 
 GEM
   remote: https://rubygems.org/
