@@ -12,7 +12,7 @@ workflows:
 jobs:
   "jruby-9.2":
     docker:
-      - image: jruby:9.2
+      - image: circleci/jruby:9.2
       - image: amazon/dynamodb-local
         environment:
           MAX_HEAP_SIZE: 1024m
