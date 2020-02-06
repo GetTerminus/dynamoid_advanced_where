@@ -6,6 +6,5 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 gem 'pry'
-gem 'dynamoid', github: 'dynamoid/dynamoid'
-gem 'activemodel', '< 5.2'
+# gem 'activemodel', '< 5.2'
 
