@@ -1,4 +1,12 @@
-version: 2
+version: 2.0
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "ruby-2.5"
+      - "ruby-2.6"
+      - "ruby-2.7"
 
 jobs:
   "ruby-2.5":
@@ -26,7 +34,7 @@ jobs:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
-      - run: bundle exec appraisal rspec --format progress
+      - run: BUNDLE_PATH=$(pwd)/vendor/bundle  bundle exec appraisal rspec --format progress
 
   "ruby-2.6":
     docker:
@@ -53,7 +61,7 @@ jobs:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
-      - run: bundle exec appraisal rspec --format progress
+      - run: BUNDLE_PATH=$(pwd)/vendor/bundle bundle exec appraisal rspec --format progress
 
   "ruby-2.7":
     docker:
@@ -80,7 +88,7 @@ jobs:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
-      - run: bundle exec appraisal rspec --format progress
+      - run: BUNDLE_PATH=$(pwd)/vendor/bundle bundle exec appraisal rspec --format progress
 
 
 
