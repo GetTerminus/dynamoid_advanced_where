@@ -6,6 +6,7 @@ being added as it is needed.
 
 This gem is tested against:
 * MRI 2.5, 2.6, and 2.7
+* Dynamoid 3.4
 
 ## Installation
 
