@@ -4,6 +4,7 @@ require_relative './equality_node'
 require_relative './greater_than_node'
 require_relative './exists_node'
 require_relative './includes'
+require_relative './subfield'
 
 module DynamoidAdvancedWhere
   module Nodes
@@ -11,40 +12,51 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsEquality
       include Concerns::SupportsExistance
 
-      attr_accessor :klass, :field_name, :attr_prefix
+      attr_accessor :field_path, :attr_prefix
 
       class << self
-        def create_node(klass:, field_name:)
-          attr_config = klass.attributes[field_name]
-          specific_klass = FIELD_MAPPING.detect { |config, type| config <= attr_config }&.last
+        def create_node(field_path:, attr_config:)
+          specific_klass = FIELD_MAPPING.detect do |config, _type|
+            config.respond_to?(:call) ? config.call(attr_config) : config <= attr_config
+          end&.last
 
-          raise ArgumentError, "unable to find field type for `#{attr_config}`" unless specific_klass
+          unless specific_klass
+            raise ArgumentError, "unable to find field type for `#{attr_config}`"
+          end
 
-          specific_klass.new(field_name: field_name, klass: klass)
+          specific_klass.new(field_path: field_path)
         end
       end
 
-      def initialize(field_name:, klass:)
-        self.field_name = field_name
-        self.klass = klass
+      def initialize(field_path:)
+        self.field_path = field_path.is_a?(Array) ? field_path : [field_path]
         self.attr_prefix = SecureRandom.hex
         freeze
       end
 
       def to_expression
-        "##{attr_prefix}"
+        String.new.tap do |s|
+          field_path.collect.with_index do |segment, i|
+            if segment.is_a?(Integer)
+              s << "[#{segment}]"
+            else
+              s << '.' unless s.blank?
+              s << "##{attr_prefix}#{i}"
+            end
+          end
+        end
       end
 
       def expression_attribute_names
-        { "##{attr_prefix}" => field_name }
+        field_path.each_with_object({}).with_index do |(segment, hsh), i|
+          next if segment.is_a?(Integer)
+
+          hsh["##{attr_prefix}#{i}"] = segment
+        end
       end
 
       def expression_attribute_values
         {}
-      end
-
-      def attr_config
-        klass.attributes[field_name]
       end
     end
 
@@ -105,7 +117,9 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(String)
+        unless val.is_a?(String)
+          raise ArgumentError, "unable to compare date to type #{val.class}"
+        end
 
         val
       end
@@ -115,10 +129,24 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(Integer)
+        unless val.is_a?(Integer)
+          raise ArgumentError, "unable to compare date to type #{val.class}"
+        end
 
         val
       end
+    end
+
+    class MapAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
+    end
+
+    class RawAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
+    end
+
+    class CustomClassAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
     end
 
     FIELD_MAPPING = {
@@ -144,6 +172,15 @@ module DynamoidAdvancedWhere
       # Set Types
       { type: :set, of: :string } => StringSetAttributeNode,
       { type: :set, of: :integer } => IntegerSetAttributeNode,
+
+      # Map Types
+      { type: :map } => MapAttributeNode,
+
+      # Raw Types
+      { type: :raw } => RawAttributeNode,
+
+      # Custom Object
+      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode
     }.freeze
   end
 end

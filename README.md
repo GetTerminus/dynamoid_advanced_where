@@ -110,13 +110,55 @@ Valid on field types: `string`, or `set` of `String` / `Integer`
 #### Example
 `where{|r| r.foo.includes?(123) }` and `where{|r| r.foo.includes?('foo') }`
 
+### Working with Map and Raw types
+When it comes to map and raw attribute types, DAW takes the approach of
+trusting you, since the exact format is not explicitly defined or enforced.
+You may specify the path to the value, as well as the value type and it will
+behave like any other top level attribute.
+
+```
+where do |r|
+  (r.ratings.dig(:verified_reviews, :review_count, type: :number) > 100) &
+    (r.ratings.dig(:verified_reviews, :average_review, type: :number) > 4) &
+    (r.metadata.dig(:keywords, type: :set, of: :string).includes?('foo'))
+end
+```
+
+If you have a nested array, you may access the elements by index by passing an integer into the `dig` command.
+
+#### Custom Classes
+The subfield dig works with CustomClasses if the classes store their data as a hash.
+
+**Example**
+
+```ruby
+CustomAttribute = Struct.new(:sub_field_a) do
+  def self.dynamoid_dump(item)
+    item.to_h
+  end
+
+  def self.dynamoid_load(data)
+    new(**data.transform_keys(&:to_sym))
+  end
+end
+
+class Foo
+  include Dynamoid::Document
+  field :bar, CustomAttribute
+end
+
+x = Foo.create(bar: CustomAttribute.new('b'))
+Foo.where{|r| r.bar.dig(:sub_field_a, type: string).inclues?('b') }.all
+# => [x]
+```
+
 ### Boolean Operators
 
 | Logical Operator | Behavior      | Example
 | -------------    | ------------- | --------
-| `&`              | and           | `where{|r| (r.foo == 'bar') & (r.baz == 'nitch') }`
-| <code>&#124;</code>           | or            | <code>where{|r| (r.foo == 'bar') &#124; (r.baz == 'nitch') }</code>
-| `!`              | negation      | `where{ !( (r.foo == 'bar') & (r.baz == 'nitch')) }`
+| `&`              | and           | <code>where{&#124;r&#124; (r.foo == 'bar') & (r.baz == 'nitch') }</code>
+| <code>&#124;</code>           | or            | <code> where{&#124;r&#124; (r.foo == 'bar') &#124; (r.baz == 'nitch') } </code>
+| `!`              | negation      | <code>where{&#124;r&#124; !( (r.foo == 'bar') & (r.baz == 'nitch')) }</code>
 
 ## Retrieving Records
 Retrieving a pre-filtered set of records is a fairly obvious use case for the

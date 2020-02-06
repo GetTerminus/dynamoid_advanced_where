@@ -1,10 +1,10 @@
 GIT
   remote: https://github.com/dynamoid/dynamoid
-  revision: eb9276e0cc5a0823ddb144f618daebcfaa7dd15b
+  revision: 9ebb57a2b57d16e2f569eb44308be8d492e0c55a
   specs:
-    dynamoid (3.1.0)
+    dynamoid (3.4.1)
       activemodel (>= 4)
-      aws-sdk-dynamodb (~> 1)
+      aws-sdk-dynamodb (~> 1.0)
       concurrent-ruby (>= 1.0)
       null-logger
 
@@ -17,23 +17,23 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (5.1.6.2)
-      activesupport (= 5.1.6.2)
-    activesupport (5.1.6.2)
+    activemodel (5.1.7)
+      activesupport (= 5.1.7)
+    activesupport (5.1.7)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     ast (2.4.0)
-    aws-eventstream (1.0.2)
-    aws-partitions (1.146.0)
-    aws-sdk-core (3.48.2)
+    aws-eventstream (1.0.3)
+    aws-partitions (1.270.0)
+    aws-sdk-core (3.89.1)
       aws-eventstream (~> 1.0, >= 1.0.2)
-      aws-partitions (~> 1.0)
+      aws-partitions (~> 1, >= 1.239.0)
       aws-sigv4 (~> 1.1)
       jmespath (~> 1.0)
-    aws-sdk-dynamodb (1.25.0)
-      aws-sdk-core (~> 3, >= 3.48.2)
+    aws-sdk-dynamodb (1.41.0)
+      aws-sdk-core (~> 3, >= 3.71.0)
       aws-sigv4 (~> 1.1)
     aws-sigv4 (1.1.0)
       aws-eventstream (~> 1.0, >= 1.0.2)
@@ -95,7 +95,7 @@ GEM
     sexp_processor (4.12.0)
     thor (0.20.3)
     thread_safe (0.3.6)
-    tzinfo (1.2.5)
+    tzinfo (1.2.6)
       thread_safe (~> 0.1)
     unicode-display_width (1.6.1)
 
