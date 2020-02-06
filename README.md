@@ -4,6 +4,9 @@ Dynamoid Advanced where provides a more advanced query structure for selecting,
 and updating records. This is very much a work in progress and functionality is
 being added as it is needed.
 
+This gem is tested against:
+* MRI 2.5, 2.6, and 2.7
+
 ## Installation
 
 Add this line to your application's Gemfile:

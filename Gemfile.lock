@@ -108,7 +108,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   bundle-audit
-  bundler (~> 1.16)
+  bundler (>= 1.16)
   dynamoid-advanced-where!
   fasterer
   overcommit
@@ -116,3 +116,6 @@ DEPENDENCIES
   rake (~> 10.0)
   rspec (~> 3.0)
   rubocop
+
+BUNDLED WITH
+   2.1.4
