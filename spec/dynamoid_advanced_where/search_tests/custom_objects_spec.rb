@@ -20,14 +20,27 @@ RSpec.describe 'Searching custom objects' do
     end
   end
 
-  let!(:instance) { default_klass.create(custom_klass: sub_object.new(123)) }
-  let!(:instance2) { default_klass.create(custom_klass: sub_object.new(456)) }
+  describe 'searching a simple subfield' do
+    let!(:instance) { default_klass.create(custom_klass: sub_object.new(123)) }
+    let!(:instance2) { default_klass.create(custom_klass: sub_object.new(456)) }
 
-  describe 'searching a raw subfield' do
     it 'allows searching by number sub type' do
       expect(
         default_klass.where do |r|
           r.custom_klass.sub_field(:foo, type: :number) > 150
+        end.all
+      ).to eq [instance2]
+    end
+  end
+
+  describe 'it allows searching deeply into a sub object' do
+    let!(:instance) { default_klass.create(custom_klass: sub_object.new({a: [1, {c: 5}]})) }
+    let!(:instance2) { default_klass.create(custom_klass: sub_object.new({a: [1, {c: 9}]})) }
+
+    it 'allows searching by number sub type deeply nested' do
+      expect(
+        default_klass.where do |r|
+          r.custom_klass.sub_field(:foo, :a, 1, :c, type: :number) > 6
         end.all
       ).to eq [instance2]
     end

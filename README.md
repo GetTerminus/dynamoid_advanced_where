@@ -124,6 +124,8 @@ where do |r|
 end
 ```
 
+If you have a nested array, you may access the elements by index by passing an integer into the `dig` command.
+
 #### Custom Classes
 The subfield dig works with CustomClasses if the classes store their data as a hash.
 

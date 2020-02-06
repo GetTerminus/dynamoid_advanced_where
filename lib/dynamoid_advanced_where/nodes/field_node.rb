@@ -35,13 +35,22 @@ module DynamoidAdvancedWhere
       end
 
       def to_expression
-        field_path.collect.with_index do |_, i|
-          "##{attr_prefix}#{i}"
-        end.join('.')
+        String.new.tap do |s|
+          field_path.collect.with_index do |segment, i|
+            if segment.is_a?(Integer)
+              s << "[#{segment}]"
+            else
+              s << '.' unless s.blank?
+              s << "##{attr_prefix}#{i}"
+            end
+          end
+        end
       end
 
       def expression_attribute_names
         field_path.each_with_object({}).with_index do |(segment, hsh), i|
+          next if segment.is_a?(Integer)
+
           hsh["##{attr_prefix}#{i}"] = segment
         end
       end
