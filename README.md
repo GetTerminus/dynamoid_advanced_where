@@ -156,9 +156,9 @@ Foo.where{|r| r.bar.dig(:sub_field_a, type: string).inclues?('b') }.all
 
 | Logical Operator | Behavior      | Example
 | -------------    | ------------- | --------
-| `&`              | and           | `where{|r| (r.foo == 'bar') & (r.baz == 'nitch') }`
-| <code>&#124;</code>           | or            | <code>where{|r| (r.foo == 'bar') &#124; (r.baz == 'nitch') }</code>
-| `!`              | negation      | `where{ !( (r.foo == 'bar') & (r.baz == 'nitch')) }`
+| `&`              | and           | <code>where{#124;r#124; (r.foo == 'bar') & (r.baz == 'nitch') }</code>
+| <code>&#124;</code>           | or            | <code> where{#124;r#124; (r.foo == 'bar') &#124; (r.baz == 'nitch') } </code>
+| `!`              | negation      | `where{#124;r#124; !( (r.foo == 'bar') & (r.baz == 'nitch')) }`
 
 ## Retrieving Records
 Retrieving a pre-filtered set of records is a fairly obvious use case for the
