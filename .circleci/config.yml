@@ -13,19 +13,19 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: install dependencies
           command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+            BUNDLE_PATH=$(pwd)/vendor/bundle bundle exec appraisal install
       - save_cache:
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rspec --format progress
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+      - run: bundle exec appraisal rspec --format progress
 
 
 
