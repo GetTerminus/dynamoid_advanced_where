@@ -1,7 +1,15 @@
-version: 2
+version: 2.0
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - "ruby-2.5"
+      - "ruby-2.6"
+      - "ruby-2.7"
 
 jobs:
-  build:
+  "ruby-2.5":
     docker:
       - image: ruby:2.5
       - image: amazon/dynamodb-local
@@ -13,19 +21,77 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: install dependencies
           command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+            bundle install
+            bundle exec appraisal install
       - save_cache:
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-      - run: bundle exec rspec --format progress
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+      - run:  bundle exec appraisal rspec --format progress
+
+  "ruby-2.6":
+    docker:
+      - image: ruby:2.6
+      - image: amazon/dynamodb-local
+        environment:
+          MAX_HEAP_SIZE: 1024m
+          HEAP_NEWSIZE: 512m
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install
+            bundle exec appraisal install
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+      - run: bundle exec appraisal rspec --format progress
+
+  "ruby-2.7":
+    docker:
+      - image: ruby:2.7
+      - image: amazon/dynamodb-local
+        environment:
+          MAX_HEAP_SIZE: 1024m
+          HEAP_NEWSIZE: 512m
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            bundle install
+            bundle exec appraisal install
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "Appraisals" }}
+      - run: bundle exec appraisal rspec --format progress
+
+
+
 
 
 
