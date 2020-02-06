@@ -120,7 +120,7 @@ behave like any other top level attribute.
 where do |r|
   (r.ratings.dig(:verified_reviews, :review_count, type: :number) > 100) &
     (r.ratings.dig(:verified_reviews, :average_review, type: :number) > 4) &
-    (r.metadata.dig(:keywors, type: :set, of: :string).includes?('foo'))
+    (r.metadata.dig(:keywords, type: :set, of: :string).includes?('foo'))
 end
 ```
 
