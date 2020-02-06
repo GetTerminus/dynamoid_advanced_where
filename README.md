@@ -158,7 +158,7 @@ Foo.where{|r| r.bar.dig(:sub_field_a, type: string).inclues?('b') }.all
 | -------------    | ------------- | --------
 | `&`              | and           | <code>where{&#124;r&#124; (r.foo == 'bar') & (r.baz == 'nitch') }</code>
 | <code>&#124;</code>           | or            | <code> where{&#124;r&#124; (r.foo == 'bar') &#124; (r.baz == 'nitch') } </code>
-| `!`              | negation      | `where{&#124;r&#124; !( (r.foo == 'bar') & (r.baz == 'nitch')) }`
+| `!`              | negation      | <code>where{&#124;r&#124; !( (r.foo == 'bar') & (r.baz == 'nitch')) }</code>
 
 ## Retrieving Records
 Retrieving a pre-filtered set of records is a fairly obvious use case for the
