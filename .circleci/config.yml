@@ -28,6 +28,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            gem update bundler
             bundle install
             bundle exec appraisal install
       - save_cache:
@@ -55,6 +56,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            gem update bundler
             bundle install
             bundle exec appraisal install
       - save_cache:
@@ -82,6 +84,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            gem update bundler
             bundle install
             bundle exec appraisal install
       - save_cache:
