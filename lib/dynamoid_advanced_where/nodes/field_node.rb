@@ -16,9 +16,13 @@ module DynamoidAdvancedWhere
 
       class << self
         def create_node(field_path:, attr_config:)
-          specific_klass = FIELD_MAPPING.detect { |config, type| config <= attr_config }&.last
+          specific_klass = FIELD_MAPPING.detect do |config, _type|
+            config.respond_to?(:call) ? config.call(attr_config) : config <= attr_config
+          end&.last
 
-          raise ArgumentError, "unable to find field type for `#{attr_config}`" unless specific_klass
+          unless specific_klass
+            raise ArgumentError, "unable to find field type for `#{attr_config}`"
+          end
 
           specific_klass.new(field_path: field_path)
         end
@@ -104,7 +108,9 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(String)
+        unless val.is_a?(String)
+          raise ArgumentError, "unable to compare date to type #{val.class}"
+        end
 
         val
       end
@@ -114,7 +120,9 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(Integer)
+        unless val.is_a?(Integer)
+          raise ArgumentError, "unable to compare date to type #{val.class}"
+        end
 
         val
       end
@@ -125,6 +133,10 @@ module DynamoidAdvancedWhere
     end
 
     class RawAttributeNode < FieldNode
+      include Concerns::SupportsSubFields
+    end
+
+    class CustomClassAttributeNode < FieldNode
       include Concerns::SupportsSubFields
     end
 
@@ -157,6 +169,9 @@ module DynamoidAdvancedWhere
 
       # Raw Types
       { type: :raw } => RawAttributeNode,
+
+      # Custom Object
+      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode
     }.freeze
   end
 end
