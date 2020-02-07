@@ -3,7 +3,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'dynamoid_advanced_where/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'dynamoid-advanced-where'
+  spec.name          = 'dynamoid_advanced_where'
   spec.version       = DynamoidAdvancedWhere::VERSION
   spec.authors       = ['Brian Malinconico']
   spec.email         = ['bmalinconico@terminus.com']
