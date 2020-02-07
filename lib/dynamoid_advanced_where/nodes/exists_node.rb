@@ -6,6 +6,8 @@ module DynamoidAdvancedWhere
   module Nodes
     class ExistsNode < BaseNode
       include Concerns::Negatable
+      include Concerns::SupportsLogicalAnd
+      include Concerns::SupportsLogicalOr
 
       attr_accessor :field_node, :prefix
       def initialize(field_node:)

@@ -34,14 +34,24 @@ RSpec.describe "Attribute Existance" do
       ).to match_array [item1, item2]
     end
 
-    it "allows chaining" do
-      item1 = klass.create(other_simple_string: 'bar', simple_string: nil)
-      klass.create(other_simple_string: 'bar', simple_string: 'dude')
+    it "allows chaining with &" do
+      klass.create(other_simple_string: 'bar', simple_string: nil)
+      item1 = klass.create(other_simple_string: 'bar', simple_string: 'dude')
       klass2.create
 
       expect(
-        klass.where{ (other_simple_string == 'bar') & (!simple_string.exists?) }.all
+        klass.where{ simple_string.exists? & (other_simple_string == 'bar') }.all
       ).to match_array [item1]
+    end
+
+    it "allows chaining with |" do
+      item1 = klass.create(other_simple_string: 'baz', simple_string: nil)
+      item2 = klass.create(other_simple_string: 'bar', simple_string: 'dude')
+      klass2.create
+
+      expect(
+        klass.where{ simple_string.exists? | (other_simple_string == 'baz') }.all
+      ).to match_array [item1, item2]
     end
   end
 

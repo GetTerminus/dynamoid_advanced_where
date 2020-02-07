@@ -1,7 +1,20 @@
 # frozen_string_literal: true
 
+
 module DynamoidAdvancedWhere
   module Nodes
+    module Concerns
+      module SupportsLogicalAnd
+        def and(other_value)
+          AndNode.new(self, other_value)
+        end
+        alias & and
+      end
+    end
+
+    # I know this is weird but it prevents a circular dependency
+    require_relative './not'
+
     class AndNode < BaseNode
       include Concerns::Negatable
       attr_accessor :child_nodes
@@ -29,15 +42,6 @@ module DynamoidAdvancedWhere
         AndNode.new(other_value, *child_nodes)
       end
       alias & and
-    end
-
-    module Concerns
-      module SupportsLogicalAnd
-        def and(other_value)
-          AndNode.new(self, other_value)
-        end
-        alias & and
-      end
     end
   end
 end

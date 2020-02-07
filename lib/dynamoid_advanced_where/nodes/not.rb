@@ -4,8 +4,23 @@ require 'forwardable'
 
 module DynamoidAdvancedWhere
   module Nodes
+    module Concerns
+      module Negatable
+        def negate
+          NotNode.new(sub_node: self)
+        end
+        alias ! negate
+      end
+    end
+
+    # I know this is weird but it prevents a circular dependency
+    require_relative './and_node'
+    require_relative './or_node'
+
     class NotNode
       extend Forwardable
+      include Concerns::SupportsLogicalAnd
+      include Concerns::SupportsLogicalOr
 
       attr_accessor :sub_node
 
@@ -23,13 +38,5 @@ module DynamoidAdvancedWhere
       end
     end
 
-    module Concerns
-      module Negatable
-        def negate
-          NotNode.new(sub_node: self)
-        end
-        alias ! negate
-      end
-    end
   end
 end
