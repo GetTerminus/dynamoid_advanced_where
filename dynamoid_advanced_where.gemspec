@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'dynamoid', '>= 3.2', '< 4'
 
-  spec.add_development_dependency 'bundle-audit'
+  spec.add_development_dependency 'bundler-audit'
   spec.add_development_dependency 'bundler', '>= 1.16'
   spec.add_development_dependency 'fasterer'
   spec.add_development_dependency 'overcommit'
