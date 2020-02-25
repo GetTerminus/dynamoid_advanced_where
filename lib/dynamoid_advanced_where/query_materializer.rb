@@ -14,18 +14,18 @@ module DynamoidAdvancedWhere
     def initialize(query_builder:)
       self.query_builder = query_builder
       self.limit = {}
-      self.start_key = {}
+      self.start_key = { exclusive_start_key: nil }
     end
 
     def all
-      result = PartialResult.new(each.to_a)
+      result = QueryResults.new(each.to_a)
       result.last_evaluated_key = @last_evaluated_key
       result
     end
 
     def record_limit(num)
       @limit = { limit: num }
-      result = PartialResult.new(each.to_a)
+      result = QueryResults.new(each.to_a)
       result.last_evaluated_key = @last_evaluated_key
       result
     end
@@ -88,6 +88,6 @@ module DynamoidAdvancedWhere
   end
 end
 
-class PartialResult < Array
+class QueryResults < Array
   attr_accessor :last_evaluated_key
 end
