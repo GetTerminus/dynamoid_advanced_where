@@ -18,7 +18,9 @@ module DynamoidAdvancedWhere
     end
 
     def all
-      each.to_a
+      result = PartialResult.new(each.to_a)
+      result.last_evaluated_key = @last_evaluated_key
+      result
     end
 
     def record_limit(num)
