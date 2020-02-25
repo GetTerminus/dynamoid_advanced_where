@@ -18,9 +18,8 @@ module DynamoidAdvancedWhere
     end
 
     def all
-      result = QueryResults.new(each.to_a)
-      result.last_evaluated_key = @last_evaluated_key
-      result
+      @start_key = {}
+      each.to_a
     end
 
     def record_limit(num)
