@@ -20,7 +20,7 @@ RSpec.describe "Combining multiple queries with &" do
     end
 
     it "limits" do
-      result = klass.where{ (second_string == 'baz') & (simple_string == 'foo') }.record_limit(1)
+      result = klass.where{ (second_string == 'baz') & (simple_string == 'foo') }.record_limit(1).next_page
       expect(result.last_evaluated_key).to eq({'bar' => '1'})
       expect(result).to eq([item1])
     end
