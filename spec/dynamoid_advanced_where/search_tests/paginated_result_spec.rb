@@ -47,6 +47,7 @@ RSpec.describe "Paginated results" do
       end
     end
 
+    let!(:item2) { klass.create(simple_string: 'foo', bar: '0', second_string: 'a') }
     let!(:item1) { klass.create(simple_string: 'baz', bar: '1', second_string: 'x') }
     let!(:item2) { klass.create(simple_string: 'foo', bar: '2', second_string: 'y') }
     let!(:item3) { klass.create(simple_string: 'baz', bar: '3', second_string: 'z') }
@@ -58,7 +59,7 @@ RSpec.describe "Paginated results" do
     end
 
     it "limits" do
-      result = klass.where{ (simple_string == 'baz') }.record_limit(1).next_page
+      result = klass.where{ (simple_string == 'baz') }.start(nil).record_limit(1).next_page
       expect(result.last_evaluated_key).to eq({'bar' => item1.bar})
       expect(result).to eq([item1])
     end

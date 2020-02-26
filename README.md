@@ -173,6 +173,7 @@ Provided methods
 * `all`
 * `first`
 * `each` (and related enumerable methods)
+* `next_page` (see paginated results)
 
 ### Scan vs Query
 DAW will automatically preform a query when it determines it is possible,
@@ -318,6 +319,32 @@ decrement(:field_one, :field_two, by: 3)
 ```
 
 If the value of the field is currently unset, it will initialize to zero
+
+
+## Paginated Results
+
+There are a few methods to assist in retreiving a limited number of results rather than fetching everything and filtering down manually afterwards.
+
+### Next Page
+
+Using `.next_page` returns a result array that can be operated on similarly to using `.all`, except that it will only include a single page of results. Page size is internally limited by DynamoDB, or can be specified using the `.limit` method. Results returnd with this method will have a `last_evaluated_key` attribute that can be directly used as an argument for the `.start` method in order to get the next page of results. 
+
+Example:
+
+```ruby
+page1 = Foo.where{|r| r.bar == 'abcd' }.next_page # returns 1 page of results
+page2 = Foo.where{|r| r.bar == 'abcd' }.start(page1.last_evaluated_key).next_page # returns the next page of results, starting after page1
+```
+
+When `next_page` is called and there is less than 1 full page of data, `last_evaluated_key` will be nil. 
+
+### Limit
+
+Calling `.limit(integer)` after a where block will limit the number of results returned to the integer specified.
+
+### Start
+
+Start takes a hash argument with that must include the key structure of the table. If this is `nil` or an empty hash, results will start from the beginning of the table. Results obtained using `.next_page` will contain a `last_evaluated_key` that is a valid argument for this method.
 
 ## Development
 
