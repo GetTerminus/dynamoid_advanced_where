@@ -327,7 +327,7 @@ There are a few methods to assist in retreiving a limited number of results rath
 
 ### Next Page
 
-Using `.next_page` returns a result array that can be operated on similarly to using `.all`, except that it will only include a single page of results. Page size is internally limited by DynamoDB, or can be specified using the `.limit` method. Results returnd with this method will have a `last_evaluated_key` attribute that can be directly used as an argument for the `.start` method in order to get the next page of results. 
+Using `.next_page` returns a result array that can be operated on similarly to using `.all`, except that it will only include a single page of results. Page size is internally limited by DynamoDB, or can be specified using the `.record_limit` method. Results returnd with this method will have a `last_evaluated_key` attribute that can be directly used as an argument for the `.start` method in order to get the next page of results. 
 
 Example:
 
@@ -338,9 +338,9 @@ page2 = Foo.where{|r| r.bar == 'abcd' }.start(page1.last_evaluated_key).next_pag
 
 When `next_page` is called and there is less than 1 full page of data, `last_evaluated_key` will be nil. 
 
-### Limit
+### Record Limit
 
-Calling `.limit(integer)` after a where block will limit the number of results returned to the integer specified.
+Calling `.record_limit(integer)` after a where block will limit the number of results returned to the integer specified.
 
 ### Start
 
