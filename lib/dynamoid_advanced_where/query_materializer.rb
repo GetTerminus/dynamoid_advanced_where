@@ -51,11 +51,12 @@ module DynamoidAdvancedWhere
     def each_via_query
       query = {
         table_name: table_name,
-      }.merge(filter_builder.to_query_filter)
+      }.merge(filter_builder.to_query_filter).merge(limit).merge(start_key)
 
       results = client.query(query)
 
       if results.items
+        @last_evaluated_key = results.last_evaluated_key
         results.items.each do |item|
           yield klass.from_database(item.symbolize_keys)
         end
