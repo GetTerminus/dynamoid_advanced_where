@@ -20,22 +20,10 @@ RSpec.describe "Paginated results" do
       ).to match_array [item1, item3]
     end
 
-    it "limits" do
-      result = klass.where{ (simple_string == 'baz') }.record_limit(1).next_page
-      expect(result.last_evaluated_key).to eq({'bar' => '1'})
-      expect(result).to eq([item1])
-    end
-
-    it "limits from a start point" do
+    it "returns from a start point" do
       expect(
-        klass.where{ (simple_string == 'baz') }.start({bar: item1.bar }).record_limit(1).next_page
+        klass.where{ (simple_string == 'baz') }.start({bar: item1.bar }).all
       ).to match_array [item3]
-    end
-
-    it "returns nil on last page" do
-      result = klass.where{ (simple_string == 'baz') }.start({bar: item1.bar }).record_limit(5).next_page
-      expect(result).to match_array [item3]
-      expect(result.last_evaluated_key).to be_nil
     end
   end
 
@@ -47,7 +35,7 @@ RSpec.describe "Paginated results" do
       end
     end
 
-    let!(:item2) { klass.create(simple_string: 'foo', bar: '0', second_string: 'a') }
+    let!(:item0) { 4.times { |i| klass.create(simple_string: 'foo', bar: "junk#{i}", second_string: 'a') } }
     let!(:item1) { klass.create(simple_string: 'baz', bar: '1', second_string: 'x') }
     let!(:item2) { klass.create(simple_string: 'foo', bar: '2', second_string: 'y') }
     let!(:item3) { klass.create(simple_string: 'baz', bar: '3', second_string: 'z') }
@@ -58,16 +46,10 @@ RSpec.describe "Paginated results" do
       ).to match_array [item1, item3]
     end
 
-    it "limits" do
-      result = klass.where{ (simple_string == 'baz') }.start(nil).record_limit(1).next_page
-      expect(result.last_evaluated_key).to eq({'bar' => item1.bar})
-      expect(result).to eq([item1])
-    end
-
     it "limits with start" do
-      start_key = klass.where{ (simple_string == 'baz') }.record_limit(1).next_page.last_evaluated_key
+      start_key = { bar: item1.bar }
       expect(
-        klass.where{ (simple_string == 'baz') }.start(start_key).record_limit(1)
+        klass.where{ (simple_string == 'baz') }.start(start_key).all
       ).to match_array [item3]
     end
   end

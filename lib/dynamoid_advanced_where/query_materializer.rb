@@ -3,7 +3,7 @@ require_relative './filter_builder'
 module DynamoidAdvancedWhere
   class QueryMaterializer
     include Enumerable
-    attr_accessor :query_builder, :limit, :start_key, :last_evaluated_key
+    attr_accessor :query_builder, :start_key
 
     delegate :klass, to: :query_builder
     delegate :table_name, to: :klass
@@ -13,24 +13,11 @@ module DynamoidAdvancedWhere
 
     def initialize(query_builder:)
       self.query_builder = query_builder
-      self.limit = {}
       self.start_key = {}
     end
 
     def all
       each.to_a
-    end
-
-    def next_page
-      @start_key = { exclusive_start_key: nil } if @start_key.empty?
-      result = ResultPage.new(each.to_a)
-      result.last_evaluated_key = @last_evaluated_key
-      result
-    end
-
-    def record_limit(num)
-      @limit = { limit: num }
-      self
     end
 
     def start(key_hash)
@@ -51,12 +38,11 @@ module DynamoidAdvancedWhere
     def each_via_query
       query = {
         table_name: table_name,
-      }.merge(filter_builder.to_query_filter).merge(limit).merge(start_key)
+      }.merge(filter_builder.to_query_filter).merge(start_key)
 
       results = client.query(query)
 
       if results.items
-        @last_evaluated_key = results.last_evaluated_key
         results.items.each do |item|
           yield klass.from_database(item.symbolize_keys)
         end
@@ -66,12 +52,11 @@ module DynamoidAdvancedWhere
     def each_via_scan
       query = {
         table_name: table_name
-      }.merge(filter_builder.to_scan_filter).merge(limit).merge(start_key)
+      }.merge(filter_builder.to_scan_filter).merge(start_key)
 
       results = client.scan(query)
 
       if results.items
-        @last_evaluated_key = results.last_evaluated_key
         results.items.each do |item|
           yield klass.from_database(item.symbolize_keys)
         end
