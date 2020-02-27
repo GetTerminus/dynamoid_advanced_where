@@ -1,6 +1,13 @@
 require 'spec_helper'
 
-RSpec.describe "Paginated results" do
+RSpec.describe "Start key results" do
+  let(:large_string) { "a" * 400000 }
+  let!(:item1) { klass.create(simple_string: 'baz', bar: '1', second_string: large_string) }
+  let!(:item2) { klass.create(simple_string: 'foo', bar: '2', second_string: large_string) }
+  let!(:item3) { klass.create(simple_string: 'baz', bar: '3', second_string: large_string) }
+  let!(:item4) { klass.create(simple_string: 'foo', bar: '4', second_string: large_string) }
+  let!(:item5) { klass.create(simple_string: 'baz', bar: '5', second_string: large_string) }
+  let!(:item6) { klass.create(simple_string: 'baz', bar: '6', second_string: large_string) }
 
   describe "with only a hash key" do
     let(:klass) do
@@ -10,26 +17,22 @@ RSpec.describe "Paginated results" do
       end
     end
 
-    let!(:item1) { klass.create(simple_string: 'baz', bar: '1') }
-    let!(:item2) { klass.create(simple_string: 'foo', bar: '2') }
-    let!(:item3) { klass.create(simple_string: 'baz', bar: '3') }
-
     it "returns all without a start key" do
       expect(
         klass.where{ (simple_string == 'baz') }.all
-      ).to match_array [item1, item3]
+      ).to match_array [item1, item3, item5, item6]
     end
 
     it "returns from a start point" do
       expect(
         klass.where{ (simple_string == 'baz') }.start({bar: item1.bar }).all
-      ).to match_array [item3]
+      ).to match_array [item3, item5, item6]
     end
 
     it "handles nil start points" do
       expect(
         klass.where{ (simple_string == 'baz') }.start(nil).all
-      ).to match_array [item1, item3]
+      ).to match_array [item1, item3, item5, item6]
     end
   end
 
@@ -41,22 +44,18 @@ RSpec.describe "Paginated results" do
       end
     end
 
-    let!(:item0) { 4.times { |i| klass.create(simple_string: 'foo', bar: "junk#{i}", second_string: 'a') } }
-    let!(:item1) { klass.create(simple_string: 'baz', bar: '1', second_string: 'x') }
-    let!(:item2) { klass.create(simple_string: 'foo', bar: '2', second_string: 'y') }
-    let!(:item3) { klass.create(simple_string: 'baz', bar: '3', second_string: 'z') }
-
     it "returns all without a start key" do
       expect(
         klass.where{ (simple_string == 'baz') }.all
-      ).to match_array [item1, item3]
+      ).to match_array [item1, item3, item5, item6]
     end
 
     it "returns from a start point" do
-      start_key = { bar: item1.bar }
+      first = klass.where { (simple_string == 'baz') }.all.first
+      start_key = { bar: first.bar }
       expect(
         klass.where{ (simple_string == 'baz') }.start(start_key).all
-      ).to match_array [item3]
+      ).to eq [item3, item5, item6]
     end
   end
 end
