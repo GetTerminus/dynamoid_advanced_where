@@ -176,7 +176,7 @@ Provided methods
 
 ### Start
 
-`.start({ some_hash_key: some_value })` takes a hash argument with that must match the key structure of the table (range key must be specified where valid). If passed an empty hash, results will start from the beginning of the table. Records before the specified start key will not be scanned or returned. This is useful when doing manual pagination.
+`.start({ some_hash_key: some_value })` takes a hash argument that must match the key structure of the table (range key must be specified where valid). If passed an empty hash, results will start from the beginning of the table. Records before the specified start key will not be scanned or returned. This is useful when doing manual pagination.
 
 ### Scan vs Query
 DAW will automatically preform a query when it determines it is possible,
