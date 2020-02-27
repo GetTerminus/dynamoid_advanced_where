@@ -39,7 +39,7 @@ module DynamoidAdvancedWhere
     def each_via_query
       query = {
         table_name: table_name
-      }.merge(filter_builder.to_scan_filter)
+      }.merge(filter_builder.to_query_filter)
 
       loop do
         results = client.query(query.merge(exclusive_start_key: @start_key))
