@@ -76,7 +76,3 @@ module DynamoidAdvancedWhere
     end
   end
 end
-
-class ResultPage < Array
-  attr_accessor :last_evaluated_key
-end

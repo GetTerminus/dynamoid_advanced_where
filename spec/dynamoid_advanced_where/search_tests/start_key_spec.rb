@@ -25,6 +25,12 @@ RSpec.describe "Paginated results" do
         klass.where{ (simple_string == 'baz') }.start({bar: item1.bar }).all
       ).to match_array [item3]
     end
+
+    it "handles nil start points" do
+      expect(
+        klass.where{ (simple_string == 'baz') }.start(nil).all
+      ).to match_array [item1, item3]
+    end
   end
 
   describe "with a hash and range key" do
