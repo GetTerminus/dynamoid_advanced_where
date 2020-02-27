@@ -6,7 +6,7 @@ module DynamoidAdvancedWhere
   class QueryBuilder
     attr_accessor :klass, :root_node
 
-    delegate :all, :each, :start, to: :query_materializer
+    delegate :all, :each, :start, :last_evaluated_key, to: :query_materializer
 
     def initialize(klass:, &blk)
       self.klass = klass

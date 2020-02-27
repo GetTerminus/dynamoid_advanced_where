@@ -3,7 +3,7 @@ require_relative './filter_builder'
 module DynamoidAdvancedWhere
   class QueryMaterializer
     include Enumerable
-    attr_accessor :query_builder, :start_key
+    attr_accessor :query_builder, :start_key, :last_evaluated_key
 
     delegate :klass, to: :query_builder
     delegate :table_name, to: :klass
@@ -41,7 +41,7 @@ module DynamoidAdvancedWhere
       }.merge(filter_builder.to_query_filter).merge(start_key)
 
       results = client.query(query)
-
+      self.last_evaluated_key = results.last_evaluated_key
       if results.items
         results.items.each do |item|
           yield klass.from_database(item.symbolize_keys)
@@ -55,6 +55,7 @@ module DynamoidAdvancedWhere
       }.merge(filter_builder.to_scan_filter).merge(start_key)
 
       results = client.scan(query)
+      self.last_evaluated_key = results.last_evaluated_key
 
       if results.items
         results.items.each do |item|

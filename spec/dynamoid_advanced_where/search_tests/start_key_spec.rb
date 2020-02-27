@@ -58,5 +58,12 @@ RSpec.describe "Paginated results" do
         klass.where{ (simple_string == 'baz') }.start(start_key).all
       ).to match_array [item3]
     end
+
+    # it "returns last_evaluated_key in the response" do
+    #   allow_any_instance_of(Seahorse::Client::Response).to receive(:last_evaluated_key) { { bar: '1'} }
+    #   resp = klass.where{ (simple_string == 'baz') }
+    #   resp.all
+    #   expect(resp.last_evaluated_key).to eq(bar: '1')
+    # end
   end
 end
