@@ -14,7 +14,7 @@ RSpec.describe "Paginated results" do
     let!(:item2) { klass.create(simple_string: 'foo', bar: '2') }
     let!(:item3) { klass.create(simple_string: 'baz', bar: '3') }
 
-    it "returns all on all" do
+    it "returns all without a start key" do
       expect(
         klass.where{ (simple_string == 'baz') }.all
       ).to match_array [item1, item3]
@@ -40,13 +40,13 @@ RSpec.describe "Paginated results" do
     let!(:item2) { klass.create(simple_string: 'foo', bar: '2', second_string: 'y') }
     let!(:item3) { klass.create(simple_string: 'baz', bar: '3', second_string: 'z') }
 
-    it "returns all on all" do
+    it "returns all without a start key" do
       expect(
         klass.where{ (simple_string == 'baz') }.all
       ).to match_array [item1, item3]
     end
 
-    it "limits with start" do
+    it "returns from a start point" do
       start_key = { bar: item1.bar }
       expect(
         klass.where{ (simple_string == 'baz') }.start(start_key).all
