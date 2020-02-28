@@ -31,11 +31,21 @@ module DynamoidAdvancedWhere
     def each(&blk)
       return enum_for(:each) unless blk
 
-      each_page.flat_map { |i, _| i }.each(&blk)
+      records.each(&blk)
     end
     alias find_each each
 
-    def each_page
+    def each_page(&blk)
+      return enum_for(:pages) unless blk
+
+      pages.each(&blk)
+    end
+
+    def records
+      pages.flat_map { |i, _| i }
+    end
+
+    def pages
       if must_scan?
         each_page_via_scan
       else
