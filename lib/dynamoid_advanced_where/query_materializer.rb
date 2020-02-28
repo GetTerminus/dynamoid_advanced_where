@@ -5,9 +5,9 @@ require_relative './filter_builder'
 module DynamoidAdvancedWhere
   class QueryMaterializer
     include Enumerable
-    attr_accessor :query_builder, :start_key
+    attr_accessor :query_builder
 
-    delegate :klass, to: :query_builder
+    delegate :klass, :start_hash, to: :query_builder
     delegate :table_name, to: :klass
     delegate :to_a, :first, to: :each
 
@@ -19,13 +19,6 @@ module DynamoidAdvancedWhere
 
     def all
       each.to_a
-    end
-
-    def start(key_hash)
-      return self if key_hash.nil? || key_hash.empty?
-
-      @start_key = key_hash
-      self
     end
 
     def each(&blk)
@@ -58,7 +51,8 @@ module DynamoidAdvancedWhere
         table_name: table_name
       }.merge(filter_builder.to_query_filter)
 
-      page_start = @start_key
+      page_start = start_hash
+
       Enumerator.new do |yielder|
         loop do
           results = client.query(query.merge(exclusive_start_key: page_start))
@@ -79,7 +73,7 @@ module DynamoidAdvancedWhere
         table_name: table_name
       }.merge(filter_builder.to_scan_filter)
 
-      page_start = @start_key
+      page_start = start_hash
 
       Enumerator.new do |yielder|
         loop do
