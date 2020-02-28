@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './filter_builder'
 
 module DynamoidAdvancedWhere
@@ -29,47 +31,59 @@ module DynamoidAdvancedWhere
     def each(&blk)
       return enum_for(:each) unless blk
 
+      each_page.flat_map { |i, _| i }.each(&blk)
+    end
+    alias find_each each
+
+    def each_page
       if must_scan?
-        each_via_scan(&blk)
+        each_page_via_scan
       else
-        each_via_query(&blk)
+        each_page_via_query
       end
     end
 
-    def each_via_query
+    def each_page_via_query
       query = {
         table_name: table_name
       }.merge(filter_builder.to_query_filter)
 
-      loop do
-        results = client.query(query.merge(exclusive_start_key: @start_key))
+      page_start = @start_key
+      Enumerator.new do |yielder|
+        loop do
+          results = client.query(query.merge(exclusive_start_key: page_start))
 
-        @start_key = results.last_evaluated_key
-        if results.items
-          results.items.each do |item|
-            yield klass.from_database(item.symbolize_keys)
+          items = (results.items || []).each do |item|
+            klass.from_database(item.symbolize_keys)
           end
+
+          yielder.yield(items, results)
+
+          (page_start = results.last_evaluated_key) || break
         end
-        break if @start_key.nil?
-      end
+      end.lazy
     end
 
-    def each_via_scan
+    def each_page_via_scan
       query = {
         table_name: table_name
       }.merge(filter_builder.to_scan_filter)
 
-      loop do
-        results = client.scan(query.merge(exclusive_start_key: @start_key))
+      page_start = @start_key
 
-        @start_key = results.last_evaluated_key
-        if results.items
-          results.items.each do |item|
-            yield klass.from_database(item.symbolize_keys)
+      Enumerator.new do |yielder|
+        loop do
+          results = client.scan(query.merge(exclusive_start_key: page_start))
+
+          items = (results.items || []).map do |item|
+            klass.from_database(item.symbolize_keys)
           end
+
+          yielder.yield(items, results)
+
+          (page_start = results.last_evaluated_key) || break
         end
-        break if @start_key.nil?
-      end
+      end.lazy
     end
 
     def filter_builder
@@ -80,6 +94,7 @@ module DynamoidAdvancedWhere
     end
 
     private
+
     def client
       Dynamoid.adapter.client
     end
