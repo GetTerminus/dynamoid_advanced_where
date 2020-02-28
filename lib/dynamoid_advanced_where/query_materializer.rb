@@ -29,7 +29,7 @@ module DynamoidAdvancedWhere
     alias find_each each
 
     def each_page(&blk)
-      return enum_for(:pages) unless blk
+      return enum_for(:each_page) unless blk
 
       pages.each(&blk)
     end
