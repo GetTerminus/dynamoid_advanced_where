@@ -4,13 +4,16 @@ require_relative './batched_updater'
 
 module DynamoidAdvancedWhere
   class QueryBuilder
-    attr_accessor :klass, :root_node
+    attr_accessor :klass, :root_node, :start_hash
 
     delegate :all, :each, to: :query_materializer
 
-    def initialize(klass:, &blk)
+    def initialize(klass:, start_hash: nil, root_node: nil, &blk)
       self.klass = klass
-      self.root_node = Nodes::RootNode.new(klass: klass, &blk)
+      self.root_node = root_node || Nodes::RootNode.new(klass: klass, &blk)
+      self.start_hash = start_hash
+
+      freeze
     end
 
     def query_materializer
@@ -43,5 +46,10 @@ module DynamoidAdvancedWhere
     end
     alias and where
 
+    def start(key_hash)
+      return self if key_hash.nil? || key_hash.empty?
+
+      self.class.new(klass: klass, start_hash: key_hash, root_node: root_node)
+    end
   end
 end
