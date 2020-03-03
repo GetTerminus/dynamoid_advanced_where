@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamoid_advanced_where (1.0.1)
+    dynamoid_advanced_where (1.1.0)
       dynamoid (>= 3.2, < 4)
 
 GEM
@@ -21,7 +21,7 @@ GEM
       thor (>= 0.14.0)
     ast (2.4.0)
     aws-eventstream (1.0.3)
-    aws-partitions (1.278.0)
+    aws-partitions (1.275.0)
     aws-sdk-core (3.90.1)
       aws-eventstream (~> 1.0, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
