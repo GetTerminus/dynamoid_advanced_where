@@ -39,16 +39,16 @@ RSpec.describe "Basic value equality matching" do
   end
 
   describe "default boolean equality" do
-    let!(:item1) { klass.create(default_bool: true) }
-    let!(:item2) { klass.create(default_bool: false) }
-    let!(:item3) { klass.create(default_bool: nil) }
+    let!(:true_item) { klass.create(default_bool: true) }
+    let!(:false_item) { klass.create(default_bool: false) }
+    let!(:nil_item) { klass.create(default_bool: nil) }
 
     it "matches true" do
-      expect(klass.where{ default_bool == true }.all).to match_array([item1])
+      expect(klass.where{ default_bool == true }.all).to match_array([true_item])
     end
 
     it "matches false" do
-      expect(klass.where{ default_bool == false }.all).to match_array([item2])
+      expect(klass.where{ default_bool == false }.all).to match_array([false_item])
     end
   end
 
