@@ -109,7 +109,7 @@ This operator may be used to check if:
 * A string contains another substring
 * A set of String or Integers contain a given value
 
-Valid on field types: `string`, or `set` of `String` / `Integer`
+Valid on field types: `string`, or `set/array` of `String` / `Integer`
 
 #### Example
 `where{|r| r.foo.includes?(123) }` and `where{|r| r.foo.includes?('foo') }`
