@@ -109,7 +109,7 @@ This operator may be used to check if:
 * A string contains another substring
 * A set of String or Integers contain a given value
 
-Valid on field types: `string`, or `set` of `String` / `Integer`
+Valid on field types: `string`, or `set/array` of `String` / `Integer`
 
 #### Example
 `where{|r| r.foo.includes?(123) }` and `where{|r| r.foo.includes?('foo') }`
@@ -173,6 +173,10 @@ Provided methods
 * `all`
 * `first`
 * `each` (and related enumerable methods)
+
+### Start
+
+`.start({ some_hash_key: some_value })` takes a hash argument that must match the key structure of the table (range key must be specified where valid). If passed an empty hash, results will start from the beginning of the table. Records before the specified start key will not be scanned or returned. This is useful when doing manual pagination.
 
 ### Scan vs Query
 DAW will automatically preform a query when it determines it is possible,

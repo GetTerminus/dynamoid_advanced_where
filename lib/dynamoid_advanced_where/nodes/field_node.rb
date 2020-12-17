@@ -130,7 +130,31 @@ module DynamoidAdvancedWhere
 
       def parse_right_hand_side(val)
         unless val.is_a?(Integer)
-          raise ArgumentError, "unable to compare date to type #{val.class}"
+          raise ArgumentError, "unable to compare integer value to type #{val.class}"
+        end
+
+        val
+      end
+    end
+
+    class StringArrayAttributeNode < FieldNode
+      include Concerns::SupportsIncludes
+
+      def parse_right_hand_side(val)
+        unless val.is_a?(String)
+          raise ArgumentError, "unable to compare string to type #{val.class}"
+        end
+
+        val
+      end
+    end
+
+    class IntegerArrayAttributeNode < FieldNode
+      include Concerns::SupportsIncludes
+
+      def parse_right_hand_side(val)
+        unless val.is_a?(Integer)
+          raise ArgumentError, "unable to compare integer to type #{val.class}"
         end
 
         val
@@ -173,6 +197,10 @@ module DynamoidAdvancedWhere
       # Set Types
       { type: :set, of: :string } => StringSetAttributeNode,
       { type: :set, of: :integer } => IntegerSetAttributeNode,
+
+      # Array Types
+      { type: :array, of: :string } => StringArrayAttributeNode,
+      { type: :array, of: :integer } => IntegerArrayAttributeNode,
 
       # Map Types
       { type: :map } => MapAttributeNode,
