@@ -6,6 +6,7 @@ RSpec.describe "Basic value equality matching" do
       field :simple_string
       field :bool, :boolean, store_as_native_boolean: false
       field :native_bool, :boolean, store_as_native_boolean: true
+      field :default_bool, :boolean
     end
   end
 
@@ -18,7 +19,7 @@ RSpec.describe "Basic value equality matching" do
       expect(klass.where{ bool == true }.all).to match_array([item1])
     end
 
-    it "matches true" do
+    it "matches false" do
       expect(klass.where{ bool == false }.all).to match_array([item2])
     end
   end
@@ -32,8 +33,22 @@ RSpec.describe "Basic value equality matching" do
       expect(klass.where{ native_bool == true }.all).to match_array([item1])
     end
 
-    it "matches true" do
+    it "matches false" do
       expect(klass.where{ native_bool == false }.all).to match_array([item2])
+    end
+  end
+
+  describe "default boolean equality" do
+    let!(:true_item) { klass.create(default_bool: true) }
+    let!(:false_item) { klass.create(default_bool: false) }
+    let!(:nil_item) { klass.create(default_bool: nil) }
+
+    it "matches true" do
+      expect(klass.where{ default_bool == true }.all).to match_array([true_item])
+    end
+
+    it "matches false" do
+      expect(klass.where{ default_bool == false }.all).to match_array([false_item])
     end
   end
 

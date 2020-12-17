@@ -182,6 +182,7 @@ module DynamoidAdvancedWhere
         NativeBooleanAttributeNode,
       { type: :boolean, store_as_native_boolean: false } =>
         StringBooleanAttributeNode,
+      { type: :boolean } => NativeBooleanAttributeNode,
 
       # Datetime fields
       { type: :datetime, store_as_string: true } => nil,
