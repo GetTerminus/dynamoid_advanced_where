@@ -5,8 +5,8 @@ and updating records. This is very much a work in progress and functionality is
 being added as it is needed.
 
 This gem is tested against:
-* MRI 2.5, 2.6, and 2.7
-* Dynamoid 3.4
+* MRI 2.5, 2.6, 2.7, and 3.0-RC
+* Dynamoid 3.4, 3.5, 3.6, and git master
 
 ## Installation
 
