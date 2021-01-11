@@ -93,7 +93,7 @@ GEM
     ruby-progressbar (1.11.0)
     ruby_parser (3.15.0)
       sexp_processor (~> 4.9)
-    sexp_processor (4.15.1)
+    sexp_processor (4.15.2)
     thor (1.0.1)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
