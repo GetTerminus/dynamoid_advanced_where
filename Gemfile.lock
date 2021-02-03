@@ -40,7 +40,7 @@ GEM
     colorize (0.8.1)
     concurrent-ruby (1.1.8)
     diff-lcs (1.4.4)
-    dynamoid (3.6.0)
+    dynamoid (3.7.0)
       activemodel (>= 4)
       aws-sdk-dynamodb (~> 1.0)
       concurrent-ruby (>= 1.0)
