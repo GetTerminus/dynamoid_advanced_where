@@ -26,7 +26,7 @@ RSpec.describe "Record limits" do
 
   describe "when querying" do
     let(:klass) do
-      new_class(table_name: 'and_check', table_opts: {key: :simple_string} ) do
+      new_class(table_name: 'and_check_record_limit', table_opts: {key: :simple_string} ) do
         range :bar
         field :simple_string
         field :second_string
