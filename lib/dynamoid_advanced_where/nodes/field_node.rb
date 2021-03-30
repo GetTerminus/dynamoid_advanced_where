@@ -4,6 +4,7 @@ require_relative './equality_node'
 require_relative './greater_than_node'
 require_relative './exists_node'
 require_relative './includes'
+require_relative './in_node'
 require_relative './subfield'
 
 module DynamoidAdvancedWhere
@@ -62,7 +63,9 @@ module DynamoidAdvancedWhere
 
     class StringAttributeNode < FieldNode
       include Concerns::SupportsIncludes
+      include Concerns::SupportsIn
     end
+
     class NativeBooleanAttributeNode < FieldNode; end
 
     class StringBooleanAttributeNode < FieldNode
