@@ -34,7 +34,7 @@ RSpec.describe 'Contains' do
   it 'raises an error if called on a string' do
     expect do
       klass.where { simple_int.includes?('a') }.all
-    end.to raise_error(ArgumentError)
+    end.to raise_error
   end
 
   it 'can find based on substring' do
