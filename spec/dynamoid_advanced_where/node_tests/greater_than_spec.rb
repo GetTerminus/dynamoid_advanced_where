@@ -54,7 +54,7 @@ RSpec.describe 'Greater Than' do
 
     it 'only returns items matching the conditions' do
       klass.create(num_int: 2)
-      item1 = klass.create(num: 5)
+      item1 = klass.create(num_int: 5)
       expect(klass.where { num_int > 4 }.all).to eq [item1]
     end
   end
