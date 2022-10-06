@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './nodes/base_node'
 require_relative './nodes/field_node'
 require_relative './nodes/literal_node'

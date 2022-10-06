@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative './nodes'
 require_relative './query_materializer'
 require_relative './batched_updater'

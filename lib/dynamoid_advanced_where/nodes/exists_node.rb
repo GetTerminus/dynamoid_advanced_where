@@ -10,6 +10,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsLogicalOr
 
       attr_accessor :field_node, :prefix
+
       def initialize(field_node:)
         self.field_node = field_node
         self.prefix = SecureRandom.hex
