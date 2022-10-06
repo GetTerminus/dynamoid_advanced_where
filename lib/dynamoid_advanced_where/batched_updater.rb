@@ -231,7 +231,7 @@ module DynamoidAdvancedWhere
     def dump(value, field_name)
       return value unless klass.attributes[field_name]
 
-      Dynamoid::Dumping.dump_field(value, config)
+      Dynamoid::Dumping.dump_field(value, klass.attributes[field_name])
     end
   end
 end
