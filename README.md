@@ -249,6 +249,23 @@ if it successfully updates. If it fails to update, it will return nil.
 If the specified hash key, or hash/range key combination is not already present
 it will be inserted with the desired mutations (if possible).
 
+### Referencing a field
+To identify the field to be updated, either through set, increment, decrement, or append you may just use the field name
+for top level keys. When you use the top level single symbol key DAW will use the built in Dynamoid dumper.
+
+If you need to reference the sub-key of a map, or custom serialized object you may pass an array of keys. Since DAW
+looses context to the "type" it is up to you to ensure you are writing out the correct values. The only exception to 
+this is if you are set the field to a class which implements `dynamoid_dump`.
+
+#### Example
+```ruby
+Model.where{ conditions }.batch_update
+  .set_values([:map_or_custom_type, :sub_field, :foo] => 'value', [:map_or_custom_type2, :foo] => MyDumpableClass.new(test))
+  .increment([:some_map, :attempts], by: 1)
+  .decrement([:some_map, :attempts_remaining], by: 1)
+  .apply(hash_key, range_key)
+```
+
 ### Setting a single field
 The batch updated method `set_values(attr_name: new_attr_value, other_atter: val)`
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 module DynamoidAdvancedWhere
@@ -15,4 +17,3 @@ module DynamoidAdvancedWhere
     end
   end
 end
-

@@ -20,9 +20,7 @@ module DynamoidAdvancedWhere
             config.respond_to?(:call) ? config.call(attr_config) : config <= attr_config
           end&.last
 
-          unless specific_klass
-            raise ArgumentError, "unable to find field type for `#{attr_config}`"
-          end
+          raise ArgumentError, "unable to find field type for `#{attr_config}`" unless specific_klass
 
           specific_klass.new(field_path: field_path)
         end
@@ -63,6 +61,7 @@ module DynamoidAdvancedWhere
     class StringAttributeNode < FieldNode
       include Concerns::SupportsIncludes
     end
+
     class NativeBooleanAttributeNode < FieldNode; end
 
     class StringBooleanAttributeNode < FieldNode
@@ -91,9 +90,10 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsGreaterThan
 
       def parse_right_hand_side(val)
-        if val.is_a?(Date)
+        case val
+        when Date
           val.to_time.to_i
-        elsif val.is_a?(Time)
+        when Time
           val.to_f
         else
           raise ArgumentError, "unable to compare datetime to type #{val.class}"
@@ -105,9 +105,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsGreaterThan
 
       def parse_right_hand_side(val)
-        if !val.is_a?(Date) || val.is_a?(DateTime)
-          raise ArgumentError, "unable to compare date to type #{val.class}"
-        end
+        raise ArgumentError, "unable to compare date to type #{val.class}" if !val.is_a?(Date) || val.is_a?(DateTime)
 
         (val - Dynamoid::Persistence::UNIX_EPOCH_DATE).to_i
       end
@@ -117,9 +115,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        unless val.is_a?(String)
-          raise ArgumentError, "unable to compare date to type #{val.class}"
-        end
+        raise ArgumentError, "unable to compare date to type #{val.class}" unless val.is_a?(String)
 
         val
       end
@@ -129,9 +125,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        unless val.is_a?(Integer)
-          raise ArgumentError, "unable to compare integer value to type #{val.class}"
-        end
+        raise ArgumentError, "unable to compare integer value to type #{val.class}" unless val.is_a?(Integer)
 
         val
       end
@@ -141,9 +135,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        unless val.is_a?(String)
-          raise ArgumentError, "unable to compare string to type #{val.class}"
-        end
+        raise ArgumentError, "unable to compare string to type #{val.class}" unless val.is_a?(String)
 
         val
       end
@@ -153,9 +145,7 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsIncludes
 
       def parse_right_hand_side(val)
-        unless val.is_a?(Integer)
-          raise ArgumentError, "unable to compare integer to type #{val.class}"
-        end
+        raise ArgumentError, "unable to compare integer to type #{val.class}" unless val.is_a?(Integer)
 
         val
       end
