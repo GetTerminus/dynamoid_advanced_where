@@ -10,6 +10,14 @@ jobs:
       matrix:
         rubyVersion: ["2.7.6", "3.0.4", "3.1.2"]
     runs-on: ubuntu-latest
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        ports:
+          - 8000/tcp
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -19,6 +27,8 @@ jobs:
           cache-version: "${{ matrix.rubyVersion }}-1"
       - name: Run RSpec
         run: bundle exec rspec
+        env:
+          DYNAMODB_HOST: http://localhost:${{job.services.dynamodb.ports[8000]}}/
       - name: Coveralls
         uses: coverallsapp/github-action@v1.1.2
         continue-on-error: true
