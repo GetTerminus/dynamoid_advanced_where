@@ -4,6 +4,9 @@ require "dynamoid"
 require "aws-sdk-dynamodb"
 require "pry"
 
+require 'webmock/rspec' # Make sure this isn't reaching out anywhere it shouldn't
+
+
 ENV['ACCESS_KEY'] ||= 'abcd'
 ENV['SECRET_KEY'] ||= '1234'
 
@@ -12,8 +15,12 @@ Aws.config.update(
   credentials: Aws::Credentials.new(ENV['ACCESS_KEY'], ENV['SECRET_KEY'])
 )
 
+WebMock.disable_net_connect!(allow: ENV.fetch('DYNAMODB_HOST', 'http://localhost:8000'))
+
+
+
 Dynamoid.configure do |config|
-  config.endpoint = 'http://127.0.0.1:8000'
+  config.endpoint =  ENV.fetch('DYNAMODB_HOST', 'http://localhost:8000')
   config.namespace = 'dynamoid_tests'
   config.warn_on_scan = false
   config.sync_retry_wait_seconds = 0
