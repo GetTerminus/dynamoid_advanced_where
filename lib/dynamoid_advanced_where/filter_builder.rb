@@ -5,7 +5,7 @@ require_relative './nodes/null_node'
 module DynamoidAdvancedWhere
   class FilterBuilder
     VALID_COMPARETORS_FOR_RANGE_FILTER = [
-      Nodes::GreaterThanNode
+      Nodes::GreaterThanNode,
     ].freeze
 
     attr_accessor :expression_node, :klass
@@ -18,13 +18,13 @@ module DynamoidAdvancedWhere
     def index_nodes
       [
         extract_query_filter_node,
-        extract_range_key_node
+        extract_range_key_node,
       ].compact
     end
 
     def to_query_filter
       {
-        key_condition_expression: key_condition_expression
+        key_condition_expression: key_condition_expression,
       }.merge!(expression_filters)
     end
 
@@ -41,21 +41,21 @@ module DynamoidAdvancedWhere
     def key_condition_expression
       @key_condition_expression ||= [
         extract_query_filter_node,
-        extract_range_key_node
+        extract_range_key_node,
       ].compact.map(&:to_expression).join(' AND ')
     end
 
     def expression_attribute_names
       [
         expression_node,
-        *index_nodes
+        *index_nodes,
       ].map(&:expression_attribute_names).inject({}, &:merge!)
     end
 
     def expression_attribute_values
       [
         expression_node,
-        *index_nodes
+        *index_nodes,
       ].map(&:expression_attribute_values).inject({}, &:merge!)
     end
 
@@ -63,7 +63,7 @@ module DynamoidAdvancedWhere
       {
         filter_expression: expression_node.to_expression,
         expression_attribute_names: expression_attribute_names,
-        expression_attribute_values: expression_attribute_values
+        expression_attribute_values: expression_attribute_values,
       }.delete_if { |_, v| v.nil? || v.empty? }
     end
 

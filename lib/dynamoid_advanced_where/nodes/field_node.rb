@@ -76,13 +76,11 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsGreaterThan
 
       ALLOWED_COMPARISON_TYPES = [
-        Numeric
+        Numeric,
       ].freeze
 
       def parse_right_hand_side(val)
-        unless ALLOWED_COMPARISON_TYPES.detect { |k| val.is_a?(k) }
-          raise ArgumentError, "unable to compare number to `#{val.class}`"
-        end
+        raise ArgumentError, "unable to compare number to `#{val.class}`" unless ALLOWED_COMPARISON_TYPES.detect { |k| val.is_a?(k) }
 
         val
       end
@@ -202,7 +200,7 @@ module DynamoidAdvancedWhere
       { type: :raw } => RawAttributeNode,
 
       # Custom Object
-      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode
+      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode,
     }.freeze
   end
 end

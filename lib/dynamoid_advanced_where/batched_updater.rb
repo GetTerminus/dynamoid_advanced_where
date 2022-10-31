@@ -22,8 +22,8 @@ module DynamoidAdvancedWhere
         return_values: 'ALL_NEW',
         key: {
           klass.hash_key => hash_key,
-          klass.range_key => range_key
-        }.delete_if { |k, _v| k.nil? }
+          klass.range_key => range_key,
+        }.delete_if { |k, _v| k.nil? },
       }
       resp = client.update_item(update_item_arguments.merge(key_args))
 
@@ -87,7 +87,7 @@ module DynamoidAdvancedWhere
       filter = merge_multiple_sets(
         [
           field_update_arguments,
-          add_update_args
+          add_update_args,
         ],
         result_base: filter_builder.to_scan_filter,
       )
@@ -103,7 +103,7 @@ module DynamoidAdvancedWhere
 
       update_args.merge!(
         collected_update_expression: [
-          "#{command} #{update_args[:collected_update_expression].join(', ')}"
+          "#{command} #{update_args[:collected_update_expression].join(', ')}",
         ]
       )
     end
@@ -114,7 +114,7 @@ module DynamoidAdvancedWhere
           [
             explicit_set_args,
             list_append_for_arrays,
-            increment_field_updates
+            increment_field_updates,
           ]
         ),
         command: 'SET'
@@ -142,8 +142,8 @@ module DynamoidAdvancedWhere
       builder_hash = {
         collected_update_expression: [],
         expression_attribute_values: {
-          ":#{zero_prefix}": 0
-        }
+          ":#{zero_prefix}": 0,
+        },
       }
 
       _increments.each_with_object(builder_hash) do |(field, change), h|
@@ -169,8 +169,8 @@ module DynamoidAdvancedWhere
       builder_hash = {
         collected_update_expression: [],
         expression_attribute_values: {
-          ":#{empty_list_prefix}": []
-        }
+          ":#{empty_list_prefix}": [],
+        },
       }
 
       update_args = _array_appends.each_with_object(builder_hash) do |to_append, h|
@@ -205,9 +205,9 @@ module DynamoidAdvancedWhere
         {
           expression_attribute_names: Hash[update_target],
           expression_attribute_values: {
-            ":#{prefix}" => dump(value, field_name)
-          }
-        }
+            ":#{prefix}" => dump(value, field_name),
+          },
+        },
       ]
     end
 
