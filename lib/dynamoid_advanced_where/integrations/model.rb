@@ -31,4 +31,4 @@ module DynamoidAdvancedWhere
   end
 end
 
-Dynamoid::Document.send(:include, DynamoidAdvancedWhere::Integrations::Model)
+Dynamoid::Document.include DynamoidAdvancedWhere::Integrations::Model
