@@ -168,6 +168,7 @@ module DynamoidAdvancedWhere
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
       { type: :number } => NumberAttributeNode,
+      { type: :integer } => NumberAttributeNode,
 
       # Boolean Fields
       { type: :boolean, store_as_native_boolean: true } =>
