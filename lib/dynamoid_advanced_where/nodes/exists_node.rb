@@ -30,7 +30,7 @@ module DynamoidAdvancedWhere
 
       def expression_attribute_values
         {
-          ":#{prefix}" => nil
+          ":#{prefix}" => nil,
         }
       end
     end

@@ -48,7 +48,7 @@ module DynamoidAdvancedWhere
 
     def each_page_via_query
       query = {
-        table_name: table_name
+        table_name: table_name,
       }.merge(filter_builder.to_query_filter)
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
@@ -76,7 +76,7 @@ module DynamoidAdvancedWhere
 
     def each_page_via_scan
       query = {
-        table_name: table_name
+        table_name: table_name,
       }.merge(filter_builder.to_scan_filter)
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
