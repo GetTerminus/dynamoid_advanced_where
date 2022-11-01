@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require_relative './nodes/base_node'
 require_relative './nodes/field_node'
 require_relative './nodes/literal_node'
+require_relative './nodes/array_literal_node'
 require_relative './nodes/operation_node'
 require_relative './nodes/root_node'
 require_relative './nodes/and_node'

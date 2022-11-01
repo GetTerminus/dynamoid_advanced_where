@@ -5,6 +5,7 @@ module DynamoidAdvancedWhere
     DEEP_MERGE_ATTRIBUTES = %i[expression_attribute_names expression_attribute_values].freeze
 
     attr_accessor :query_builder, :_set_values, :_array_appends, :_set_appends, :_increments
+
     delegate :klass, to: :query_builder
 
     def initialize(query_builder:)
@@ -86,7 +87,7 @@ module DynamoidAdvancedWhere
       filter = merge_multiple_sets(
         [
           field_update_arguments,
-          add_update_args,
+          add_update_args
         ],
         result_base: filter_builder.to_scan_filter,
       )
@@ -129,10 +130,9 @@ module DynamoidAdvancedWhere
 
       _set_values.each_with_object(builder_hash) do |(k, v), h|
         prefix = merge_in_attr_placeholders(h, k, v)
-        h[:collected_update_expression] << "##{prefix} = :#{prefix}"
+        h[:collected_update_expression] << "#{prefix[0]} = :#{prefix[1]}"
       end
     end
-
 
     def increment_field_updates
       return {} if _increments.empty?
@@ -148,7 +148,7 @@ module DynamoidAdvancedWhere
 
       _increments.each_with_object(builder_hash) do |(field, change), h|
         prefix = merge_in_attr_placeholders(h, field, change)
-        builder_hash[:collected_update_expression] << "##{prefix} = if_not_exists(##{prefix}, :#{zero_prefix}) + :#{prefix}"
+        builder_hash[:collected_update_expression] << "#{prefix[0]} = if_not_exists(#{prefix[0]}, :#{zero_prefix}) + :#{prefix[1]}"
       end
     end
 
@@ -158,7 +158,7 @@ module DynamoidAdvancedWhere
       _set_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k, v|
           prefix = merge_in_attr_placeholders(h, k, v)
-          builder_hash[:collected_update_expression] << "##{prefix} :#{prefix}"
+          builder_hash[:collected_update_expression] << "#{prefix[0]} :#{prefix[1]}"
         end
       end
     end
@@ -176,7 +176,7 @@ module DynamoidAdvancedWhere
       update_args = _array_appends.each_with_object(builder_hash) do |to_append, h|
         to_append.each do |k, v|
           prefix = merge_in_attr_placeholders(h, k, v)
-          builder_hash[:collected_update_expression] << "##{prefix}  = list_append(if_not_exists(##{prefix}, :#{empty_list_prefix}), :#{prefix})"
+          builder_hash[:collected_update_expression] << "#{prefix[0]}  = list_append(if_not_exists(#{prefix[0]}, :#{empty_list_prefix}), :#{prefix[1]})"
         end
       end
 
@@ -184,7 +184,7 @@ module DynamoidAdvancedWhere
     end
 
     def merge_in_attr_placeholders(hsh, field_name, value)
-      prefix, new_data = prefixerize(field_name, value)
+      *prefix, new_data = prefixerize(field_name, value)
 
       hsh.merge!(new_data, &method(:hash_extendeer))
 
@@ -192,14 +192,20 @@ module DynamoidAdvancedWhere
     end
 
     def prefixerize(field_name, value)
+      field_names = field_name.is_a?(Array) ? field_name : [field_name]
       prefix = SecureRandom.hex
 
+      update_target = field_names.each_with_index.map do |name, idx|
+        ["##{prefix}#{idx}", name]
+      end
+
       [
+        update_target.map(&:first).join('.').to_s,
         prefix,
         {
-          expression_attribute_names: { "##{prefix}" => field_name },
+          expression_attribute_names: Hash[update_target],
           expression_attribute_values: {
-            ":#{prefix}" => dump(value, klass.attributes[field_name])
+            ":#{prefix}" => dump(value, field_name)
           }
         }
       ]
@@ -222,8 +228,15 @@ module DynamoidAdvancedWhere
       )
     end
 
-    def dump(value, config)
-      Dynamoid::Dumping.dump_field(value, config)
+    def dump(value, field_name)
+      if klass.attributes[field_name]
+        Dynamoid::Dumping.dump_field(value, klass.attributes[field_name])
+      elsif value.respond_to?(:dynamoid_dump)
+        value.dynamoid_dump
+      else
+        value
+
+      end
     end
   end
 end

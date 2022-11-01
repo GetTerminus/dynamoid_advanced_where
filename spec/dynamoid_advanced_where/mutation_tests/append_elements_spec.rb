@@ -1,8 +1,7 @@
-
-RSpec.describe "Upserting" do
+RSpec.describe 'Upserting' do
   let(:id) { SecureRandom.uuid }
 
-  context "with a hash and range key" do
+  context 'with a hash and range key' do
     let(:klass) do
       new_class(table_name: 'appending_with_range_test') do
         field :simple_string
@@ -17,10 +16,10 @@ RSpec.describe "Upserting" do
     it "performs the 'sert' side of upsert append" do
       expect(
         klass
-        .batch_update
-        .set_values(simple_string: 'hi')
-        .append_to(test_set: ['foo', 'bar'], test_arr: [1, 1, 2, 3])
-        .apply('foo', 123)
+          .batch_update
+          .set_values(simple_string: 'hi')
+          .append_to(test_set: %w[foo bar], test_arr: [1, 1, 2, 3])
+          .apply('foo', 123)
       ).to be_a_kind_of(klass).and have_attributes(
         id: 'foo',
         numb_a: 123,
@@ -29,10 +28,9 @@ RSpec.describe "Upserting" do
         test_arr: [1, 1, 2, 3]
       )
     end
-
   end
 
-  context "with only a hash key" do
+  context 'with only a hash key' do
     let(:klass) do
       new_class(table_name: 'appending_without_range_test') do
         field :simple_string
@@ -44,10 +42,10 @@ RSpec.describe "Upserting" do
     it "performs the 'sert' side of upsert append" do
       expect(
         klass
-        .batch_update
-        .set_values(simple_string: 'hi')
-        .append_to(test_set: ['foo', 'bar'], test_arr: [1, 1, 2, 3])
-        .apply('foo')
+          .batch_update
+          .set_values(simple_string: 'hi')
+          .append_to(test_set: %w[foo bar], test_arr: [1, 1, 2, 3])
+          .apply('foo')
       ).to be_a_kind_of(klass).and have_attributes(
         id: 'foo',
         simple_string: 'hi',
@@ -56,9 +54,9 @@ RSpec.describe "Upserting" do
       )
     end
 
-    context "when modifying an existing item" do
+    context 'when modifying an existing item' do
       let!(:instance) do
-        klass.create(simple_string: 'foo', test_set: ['abc'], test_arr: [9] )
+        klass.create(simple_string: 'foo', test_set: ['abc'], test_arr: [9])
       end
 
       it 'updates that item' do
@@ -73,9 +71,9 @@ RSpec.describe "Upserting" do
         )
       end
 
-      it "performs the update conditionally" do
+      it 'performs the update conditionally' do
         expect(
-          klass.where{ simple_string != 'foo' }.batch_update.append_to(
+          klass.where { simple_string != 'foo' }.batch_update.append_to(
             test_set: ['def'],
             test_arr: [1],
           ).apply(instance.id)

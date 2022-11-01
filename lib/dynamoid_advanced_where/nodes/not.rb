@@ -37,6 +37,5 @@ module DynamoidAdvancedWhere
         "NOT(#{sub_node.to_expression})"
       end
     end
-
   end
 end

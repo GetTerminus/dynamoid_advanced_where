@@ -4,9 +4,8 @@ require 'securerandom'
 
 module DynamoidAdvancedWhere
   module Nodes
-    class LiteralNode
+    class ArrayLiteralNode
       attr_accessor :value, :attr_prefix
-
       def initialize(value)
         self.value = value
         self.attr_prefix = SecureRandom.hex
@@ -14,7 +13,10 @@ module DynamoidAdvancedWhere
       end
 
       def to_expression
-        ":#{attr_prefix}"
+        values = value.each_with_index.map do |_, idx|
+          ":#{attr_prefix}#{idx}"
+        end
+        "(#{values.join(', ')})"
       end
 
       def expression_attribute_names
@@ -22,7 +24,9 @@ module DynamoidAdvancedWhere
       end
 
       def expression_attribute_values
-        { ":#{attr_prefix}" => value }
+        value.each_with_index.map do |val, idx|
+          [":#{attr_prefix}#{idx}", val]
+        end.to_h
       end
     end
   end

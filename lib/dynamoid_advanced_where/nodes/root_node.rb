@@ -40,7 +40,7 @@ module DynamoidAdvancedWhere
                             instance_eval(&blk)
                           else
                             blk.call(self)
-                       end
+                          end
       end
     end
   end
