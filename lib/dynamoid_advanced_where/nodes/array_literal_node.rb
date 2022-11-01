@@ -6,6 +6,7 @@ module DynamoidAdvancedWhere
   module Nodes
     class ArrayLiteralNode
       attr_accessor :value, :attr_prefix
+
       def initialize(value)
         self.value = value
         self.attr_prefix = SecureRandom.hex

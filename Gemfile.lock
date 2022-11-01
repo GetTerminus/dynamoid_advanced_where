@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamoid_advanced_where (1.4.0)
+    dynamoid_advanced_where (1.5.0)
       dynamoid (>= 3.2, < 4)
 
 GEM
