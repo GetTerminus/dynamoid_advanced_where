@@ -4,6 +4,7 @@ require_relative './equality_node'
 require_relative './greater_than_node'
 require_relative './exists_node'
 require_relative './includes'
+require_relative './in_node'
 require_relative './subfield'
 
 module DynamoidAdvancedWhere
@@ -60,6 +61,7 @@ module DynamoidAdvancedWhere
 
     class StringAttributeNode < FieldNode
       include Concerns::SupportsIncludes
+      include Concerns::SupportsIn
     end
 
     class NativeBooleanAttributeNode < FieldNode; end
@@ -74,13 +76,11 @@ module DynamoidAdvancedWhere
       include Concerns::SupportsGreaterThan
 
       ALLOWED_COMPARISON_TYPES = [
-        Numeric
+        Numeric,
       ].freeze
 
       def parse_right_hand_side(val)
-        unless ALLOWED_COMPARISON_TYPES.detect { |k| val.is_a?(k) }
-          raise ArgumentError, "unable to compare number to `#{val.class}`"
-        end
+        raise ArgumentError, "unable to compare number to `#{val.class}`" unless ALLOWED_COMPARISON_TYPES.detect { |k| val.is_a?(k) }
 
         val
       end
@@ -166,6 +166,7 @@ module DynamoidAdvancedWhere
     FIELD_MAPPING = {
       { type: :string } => StringAttributeNode,
       { type: :number } => NumberAttributeNode,
+      { type: :integer } => NumberAttributeNode,
 
       # Boolean Fields
       { type: :boolean, store_as_native_boolean: true } =>
@@ -199,7 +200,7 @@ module DynamoidAdvancedWhere
       { type: :raw } => RawAttributeNode,
 
       # Custom Object
-      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode
+      ->(c) { c[:type].is_a?(Class) } => CustomClassAttributeNode,
     }.freeze
   end
 end

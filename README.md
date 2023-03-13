@@ -114,6 +114,16 @@ Valid on field types: `string`, or `set/array` of `String` / `Integer`
 #### Example
 `where{|r| r.foo.includes?(123) }` and `where{|r| r.foo.includes?('foo') }`
 
+### In?
+This operator may be used to check if:
+
+* A string field is one of an enumerable set of values
+
+Valid on field types: `string`
+
+#### Example
+`where{|r| r.foo.in?(['foo', 'bar']) }`
+
 ### Working with Map and Raw types
 When it comes to map and raw attribute types, DAW takes the approach of
 trusting you, since the exact format is not explicitly defined or enforced.

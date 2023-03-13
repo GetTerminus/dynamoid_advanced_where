@@ -1,3 +1,9 @@
+inherit_from:
+  - .rubocop_todo.yml
+  - https://raw.githubusercontent.com/GetTerminus/ruby_shared_configs/master/.rubocop-3-1.yml
+
+
+
 AllCops:
   Exclude:
     - bin/*

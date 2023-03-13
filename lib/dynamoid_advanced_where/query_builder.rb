@@ -67,7 +67,7 @@ module DynamoidAdvancedWhere
       self.class.new(**{
         klass: klass,
         start_hash: start_hash,
-        root_node: root_node
+        root_node: root_node,
       }.merge(changes))
     end
   end
