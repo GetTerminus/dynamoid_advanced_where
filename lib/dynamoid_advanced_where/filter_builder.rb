@@ -93,6 +93,7 @@ module DynamoidAdvancedWhere
 
     def field_node_valid_for_key_filter(node)
       node.is_a?(Nodes::EqualityNode) &&
+        node.respond_to?(:lh_operation) &&
         node.lh_operation.is_a?(Nodes::FieldNode) &&
         node.lh_operation.field_path.length == 1 &&
         node.lh_operation.field_path[0].to_s == hash_key
@@ -119,7 +120,8 @@ module DynamoidAdvancedWhere
     end
 
     def field_node_valid_for_range_filter(node)
-      node.lh_operation.is_a?(Nodes::FieldNode) &&
+      node.respond_to?(:lh_operation) &&
+        node.lh_operation.is_a?(Nodes::FieldNode) &&
         node.lh_operation.field_path.length == 1 &&
         node.lh_operation.field_path[0].to_s == range_key &&
         VALID_COMPARETORS_FOR_RANGE_FILTER.any? { |type| node.is_a?(type) }
