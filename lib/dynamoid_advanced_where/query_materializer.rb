@@ -47,6 +47,7 @@ module DynamoidAdvancedWhere
     def each_page_via_query
       query = {
         table_name: table_name,
+        index_name: selected_index_for_query,
       }.merge(filter_builder.to_query_filter)
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
@@ -107,8 +108,53 @@ module DynamoidAdvancedWhere
       )
     end
 
+    # Pick the index to query. 
+    #   1) The first index chosen should be one that has the range and hash key satisfied.
+    #   2) The second should be one that has the hash key
+    def selected_index_for_query
+      possible_fields = filter_builder.extractable_fields_for_hash_and_range
+
+      indexes = satisfiable_indexes.each do |name, definition|
+        next unless possible_fields.key?(definition[:hash_key]) && 
+                    possible_fields.key?(definition[:range_key])
+
+        filter_builder.set_node_for_range_key(possible_fields[definition[:range_key]])
+        filter_builder.set_node_for_query_filter(possible_fields[definition[:hash_key]])
+
+        return name
+      end
+
+      # Just take the first matching query then
+      name, definition = satisfiable_indexes.first
+      filter_builder.set_node_for_query_filter(possible_fields[definition[:hash_key]])
+      filter_builder.set_node_for_range_key(possible_fields[definition[:range_key]]) unless possible_fields[definition[:range_key]].blank?
+
+      return name
+    end
+
     def must_scan?
-      true
+      satisfiable_indexes.empty?
+    end
+
+    # find all indexes where we have a predicate on the hash key
+    def satisfiable_indexes
+      possible_fields = filter_builder.extractable_fields_for_hash_and_range
+
+      all_possible_indexes.select do |_, definition|
+        possible_fields.key?(definition[:hash_key])
+      end
+    end
+
+    def all_possible_indexes
+      # The nil index name is the table itself
+      idx = { nil => {hash_key: klass.hash_key.to_s, range_key: klass.range_key.to_s} }
+
+      klass.indexes.each do |name, definition|
+        next unless definition.projected_attributes == :all
+        idx[name] = {hash_key: definition.hash_key.to_s, range_key: definition.range_key.to_s}
+      end
+
+      idx
     end
 
     private

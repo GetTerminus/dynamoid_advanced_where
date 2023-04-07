@@ -33,6 +33,37 @@ module DynamoidAdvancedWhere
       expression_filters
     end
 
+    def set_node_for_range_key(node)
+      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
+
+      self.range_key_node = node
+
+      self.expression_node = Nodes::AndNode.new(
+        *(expression_node.child_nodes - [node])
+      )
+    end
+
+    def set_node_for_query_filter(node)
+      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
+
+      self.query_filter_node = node
+
+      self.expression_node = Nodes::AndNode.new(
+        *(expression_node.child_nodes - [node])
+      )
+    end
+
+    # Returns a hash of the field name and the node that filters on it
+    def extractable_fields_for_hash_and_range
+      expression_node.child_nodes.each_with_object({}) do |node, hash|
+        next unless node.respond_to?(:lh_operation) &&
+                      node.lh_operation.is_a?(Nodes::FieldNode) &&
+                      node.lh_operation.field_path.length == 1
+
+        hash[node.lh_operation.field_path[0].to_s] = node
+      end
+    end
+
     private
 
     def key_condition_expression
@@ -62,34 +93,6 @@ module DynamoidAdvancedWhere
         expression_attribute_names: expression_attribute_names,
         expression_attribute_values: expression_attribute_values,
       }.delete_if { |_, v| v.nil? || v.empty? }
-    end
-
-    def set_node_for_range_key(node)
-      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
-
-      range_key_node = node
-
-      self.expression_node = Nodes::AndNode.new(
-        *(expression_node.child_nodes - node)
-      )
-    end
-
-    def set_node_for_query_filter(node)
-      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
-
-      query_filter_node = node
-
-      self.expression_node = Nodes::AndNode.new(
-        *(expression_node.child_nodes - node)
-      )
-    end
-
-    def extractable_fields_for_hash_and_range
-      expression_node.child_nodes.select do |i|
-        node.respond_to?(:lh_operation) &&
-          node.lh_operation.is_a?(Nodes::FieldNode) &&
-          node.lh_operation.field_path.length == 1
-      end
     end
   end
 end
