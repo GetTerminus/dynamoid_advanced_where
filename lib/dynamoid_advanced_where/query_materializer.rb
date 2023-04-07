@@ -11,8 +11,6 @@ module DynamoidAdvancedWhere
     delegate :table_name, to: :klass
     delegate :to_a, :first, to: :each
 
-    delegate :must_scan?, to: :filter_builder
-
     def initialize(query_builder:)
       self.query_builder = query_builder
     end
@@ -107,6 +105,10 @@ module DynamoidAdvancedWhere
         root_node: query_builder.root_node,
         klass: klass,
       )
+    end
+
+    def must_scan?
+      true
     end
 
     private

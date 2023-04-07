@@ -4,6 +4,12 @@ RSpec.describe 'Scan vs Query' do
   let(:default_klass) do
     new_class do
       field :bar
+      field :other_indexed_field
+      field :other_indexed_field
+
+      global_secondary_index hash_key: :other_indexed_field,
+                         projected_attributes: [:bar]
+
     end
   end
 

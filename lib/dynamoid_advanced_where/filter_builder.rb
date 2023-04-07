@@ -8,17 +8,18 @@ module DynamoidAdvancedWhere
       Nodes::GreaterThanNode,
     ].freeze
 
-    attr_accessor :expression_node, :klass
+    attr_accessor :expression_node, :query_filter_node, :range_key_node, :klass
 
     def initialize(root_node:, klass:)
-      self.expression_node = root_node.child_node
+      node = root_node.child_node
+      self.expression_node = node.is_a?(Nodes::AndNode) ? node : Nodes::AndNode.new(node)
       self.klass = klass
     end
 
     def index_nodes
       [
-        extract_query_filter_node,
-        extract_range_key_node,
+        query_filter_node,
+        range_key_node,
       ].compact
     end
 
@@ -32,16 +33,12 @@ module DynamoidAdvancedWhere
       expression_filters
     end
 
-    def must_scan?
-      !extract_query_filter_node.is_a?(Nodes::BaseNode)
-    end
-
     private
 
     def key_condition_expression
       @key_condition_expression ||= [
-        extract_query_filter_node,
-        extract_range_key_node,
+        query_filter_node,
+        range_key_node,
       ].compact.map(&:to_expression).join(' AND ')
     end
 
@@ -67,72 +64,32 @@ module DynamoidAdvancedWhere
       }.delete_if { |_, v| v.nil? || v.empty? }
     end
 
-    def extract_query_filter_node
-      @extract_query_filter_node ||=
-        case expression_node
-        when Nodes::EqualityNode
-          node = expression_node
-          if field_node_valid_for_key_filter(expression_node)
-            self.expression_node = Nodes::NullNode.new
-            node
-          end
-        when Nodes::AndNode
-          id_filters = expression_node.child_nodes.select do |i|
-            field_node_valid_for_key_filter(i)
-          end
+    def set_node_for_range_key(node)
+      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
 
-          if id_filters.length == 1
-            self.expression_node = Nodes::AndNode.new(
-              *(expression_node.child_nodes - id_filters)
-            )
+      range_key_node = node
 
-            id_filters.first
-          end
-        end
+      self.expression_node = Nodes::AndNode.new(
+        *(expression_node.child_nodes - node)
+      )
     end
 
-    def field_node_valid_for_key_filter(node)
-      node.is_a?(Nodes::EqualityNode) &&
+    def set_node_for_query_filter(node)
+      raise "node not found in expression" unless expression_node.child_nodes.include?(node)
+
+      query_filter_node = node
+
+      self.expression_node = Nodes::AndNode.new(
+        *(expression_node.child_nodes - node)
+      )
+    end
+
+    def extractable_fields_for_hash_and_range
+      expression_node.child_nodes.select do |i|
         node.respond_to?(:lh_operation) &&
-        node.lh_operation.is_a?(Nodes::FieldNode) &&
-        node.lh_operation.field_path.length == 1 &&
-        node.lh_operation.field_path[0].to_s == hash_key
-    end
-
-    def extract_range_key_node
-      return unless extract_query_filter_node
-
-      @extract_range_key_node ||=
-        case expression_node
-        when Nodes::AndNode
-          id_filters = expression_node.child_nodes.select do |i|
-            field_node_valid_for_range_filter(i)
-          end
-
-          if id_filters.length == 1
-            self.expression_node = Nodes::AndNode.new(
-              *(expression_node.child_nodes - id_filters)
-            )
-
-            id_filters.first
-          end
-        end
-    end
-
-    def field_node_valid_for_range_filter(node)
-      node.respond_to?(:lh_operation) &&
-        node.lh_operation.is_a?(Nodes::FieldNode) &&
-        node.lh_operation.field_path.length == 1 &&
-        node.lh_operation.field_path[0].to_s == range_key &&
-        VALID_COMPARETORS_FOR_RANGE_FILTER.any? { |type| node.is_a?(type) }
-    end
-
-    def hash_key
-      @hash_key ||= klass.hash_key.to_s
-    end
-
-    def range_key
-      @range_key ||= klass.range_key.to_s
+          node.lh_operation.is_a?(Nodes::FieldNode) &&
+          node.lh_operation.field_path.length == 1
+      end
     end
   end
 end

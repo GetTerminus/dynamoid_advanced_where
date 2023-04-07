@@ -12,7 +12,7 @@ module DynamoidAdvancedWhere
       def initialize(klass:, &blk)
         self.klass = klass
         evaluate_block(blk) if blk
-        self.child_node ||= NullNode.new
+        self.child_node ||= AndNode.new
         freeze
       end
 
