@@ -33,7 +33,7 @@ module DynamoidAdvancedWhere
       expression_filters
     end
 
-    def set_node_for_range_key(node)
+    def select_node_for_range_key(node)
       raise 'node not found in expression' unless expression_node.child_nodes.include?(node)
 
       self.range_key_node = node
@@ -43,7 +43,7 @@ module DynamoidAdvancedWhere
       )
     end
 
-    def set_node_for_query_filter(node)
+    def select_node_for_query_filter(node)
       raise 'node not found in expression' unless expression_node.child_nodes.include?(node)
 
       self.query_filter_node = node

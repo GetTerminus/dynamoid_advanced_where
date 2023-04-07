@@ -118,16 +118,16 @@ module DynamoidAdvancedWhere
         next unless possible_fields.key?(definition[:hash_key]) &&
                     possible_fields.key?(definition[:range_key])
 
-        filter_builder.set_node_for_range_key(possible_fields[definition[:range_key]])
-        filter_builder.set_node_for_query_filter(possible_fields[definition[:hash_key]])
+        filter_builder.select_node_for_range_key(possible_fields[definition[:range_key]])
+        filter_builder.select_node_for_query_filter(possible_fields[definition[:hash_key]])
 
         return name
       end
 
       # Just take the first matching query then
       name, definition = satisfiable_indexes.first
-      filter_builder.set_node_for_query_filter(possible_fields[definition[:hash_key]])
-      filter_builder.set_node_for_range_key(possible_fields[definition[:range_key]]) unless possible_fields[definition[:range_key]].blank?
+      filter_builder.select_node_for_query_filter(possible_fields[definition[:hash_key]])
+      filter_builder.select_node_for_range_key(possible_fields[definition[:range_key]]) unless possible_fields[definition[:range_key]].blank?
 
       name
     end
