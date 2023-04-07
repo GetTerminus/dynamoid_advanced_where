@@ -58,7 +58,7 @@ module DynamoidAdvancedWhere
         loop do
           results = client.query(query.merge(exclusive_start_key: page_start))
 
-          items = (results.items || []).each do |item|
+          items = (results.items || []).map do |item|
             klass.from_database(item.symbolize_keys)
           end
 
