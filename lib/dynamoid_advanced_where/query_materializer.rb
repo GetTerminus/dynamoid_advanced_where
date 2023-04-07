@@ -149,9 +149,9 @@ module DynamoidAdvancedWhere
       # The nil index name is the table itself
       idx = { nil => {hash_key: klass.hash_key.to_s, range_key: klass.range_key.to_s} }
 
-      klass.indexes.each do |name, definition|
+      klass.indexes.each do |_, definition|
         next unless definition.projected_attributes == :all
-        idx[name] = {hash_key: definition.hash_key.to_s, range_key: definition.range_key.to_s}
+        idx[definition.name] = {hash_key: definition.hash_key.to_s, range_key: definition.range_key.to_s}
       end
 
       idx

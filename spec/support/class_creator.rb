@@ -1,5 +1,5 @@
 module ClassCreator
-  def new_class(table_name: nil, table_opts: {}, &blk)
+  def new_class(table_name: SecureRandom.uuid.tr('-',''), table_opts: {}, &blk)
     klass = Class.new do
       include Dynamoid::Document
       table({ name: (table_name || :documents) }.merge(table_opts))
