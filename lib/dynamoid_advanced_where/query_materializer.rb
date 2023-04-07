@@ -114,7 +114,7 @@ module DynamoidAdvancedWhere
     def selected_index_for_query
       possible_fields = filter_builder.extractable_fields_for_hash_and_range
 
-      indexes = satisfiable_indexes.each do |name, definition|
+      satisfiable_indexes.each do |name, definition|
         next unless possible_fields.key?(definition[:hash_key]) &&
                     possible_fields.key?(definition[:range_key])
 
