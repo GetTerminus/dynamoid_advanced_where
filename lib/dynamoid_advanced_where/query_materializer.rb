@@ -49,10 +49,10 @@ module DynamoidAdvancedWhere
         table_name: table_name,
         index_name: selected_index_for_query,
       }.merge(filter_builder.to_query_filter)
-      
-      if !query_builder.projected_fields.empty?
+
+      unless query_builder.projected_fields.empty?
         query[:select] = 'SPECIFIC_ATTRIBUTES'
-        query[:projection_expression] = query_builder.projected_fields.map(&:to_s).join(",")
+        query[:projection_expression] = query_builder.projected_fields.map(&:to_s).join(',')
       end
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
@@ -83,9 +83,9 @@ module DynamoidAdvancedWhere
         table_name: table_name,
       }.merge(filter_builder.to_scan_filter)
 
-      if !query_builder.projected_fields.empty?
+      unless query_builder.projected_fields.empty?
         query[:select] = 'SPECIFIC_ATTRIBUTES'
-        query[:projection_expression] = query_builder.projected_fields.map(&:to_s).join(",")
+        query[:projection_expression] = query_builder.projected_fields.map(&:to_s).join(',')
       end
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit

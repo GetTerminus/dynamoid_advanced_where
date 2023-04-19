@@ -51,7 +51,7 @@ module DynamoidAdvancedWhere
     alias and where
 
     def project(*fields)
-      dup_with_changes(projected_fields: projected_fields + fields) 
+      dup_with_changes(projected_fields: projected_fields + fields)
     end
 
     def limit(value)
