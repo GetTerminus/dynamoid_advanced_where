@@ -44,11 +44,13 @@ module DynamoidAdvancedWhere
       end
     end
 
-    def each_page_via_query
-      query = {
-        table_name: table_name,
-        index_name: selected_index_for_query,
-      }.merge(filter_builder.to_query_filter)
+    def enumerate_results(starting_query)
+      query = starting_query.dup
+
+      unless query_builder.projected_fields.empty?
+        query[:select] = 'SPECIFIC_ATTRIBUTES'
+        query[:projection_expression] = query_builder.projected_fields.map(&:to_s).join(',')
+      end
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
 
@@ -56,7 +58,8 @@ module DynamoidAdvancedWhere
 
       Enumerator.new do |yielder|
         loop do
-          results = client.query(query.merge(exclusive_start_key: page_start))
+          query[:exclusive_start_key] = page_start
+          results = yield(query)
 
           items = (results.items || []).map do |item|
             klass.from_database(item.symbolize_keys)
@@ -73,32 +76,25 @@ module DynamoidAdvancedWhere
       end.lazy
     end
 
+    def each_page_via_query
+      query = {
+        table_name: table_name,
+        index_name: selected_index_for_query,
+      }.merge(filter_builder.to_query_filter)
+
+      enumerate_results(query) do |q|
+        client.query(q)
+      end
+    end
+
     def each_page_via_scan
       query = {
         table_name: table_name,
       }.merge(filter_builder.to_scan_filter)
 
-      query[:limit] = query_builder.record_limit if query_builder.record_limit
-
-      page_start = start_hash
-
-      Enumerator.new do |yielder|
-        loop do
-          results = client.scan(query.merge(exclusive_start_key: page_start))
-
-          items = (results.items || []).map do |item|
-            klass.from_database(item.symbolize_keys)
-          end
-
-          yielder.yield(items, results)
-
-          query[:limit] = query[:limit] - results.items.length if query[:limit]
-
-          break if results.last_evaluated_key.nil? || query[:limit]&.zero?
-
-          (page_start = results.last_evaluated_key)
-        end
-      end.lazy
+      enumerate_results(query) do |q|
+        client.scan(q)
+      end
     end
 
     def filter_builder
