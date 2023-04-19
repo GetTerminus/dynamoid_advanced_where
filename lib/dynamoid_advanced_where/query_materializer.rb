@@ -62,7 +62,7 @@ module DynamoidAdvancedWhere
           results = yield(query)
 
           items = (results.items || []).map do |item|
-            klass.from_database(item.symbolize_keys)
+            klass.from_database(item)
           end
 
           yielder.yield(items, results)
