@@ -54,26 +54,27 @@ module DynamoidAdvancedWhere
 
       query[:limit] = query_builder.record_limit if query_builder.record_limit
 
-      page_start = start_hash
+      query[:exclusive_start_key] = start_hash
 
       Enumerator.new do |yielder|
         loop do
-          query[:exclusive_start_key] = page_start
           results = yield(query)
 
-          items = (results.items || []).map do |item|
-            klass.from_database(item)
-          end
-
-          yielder.yield(items, results)
+          yielder.yield(construct_items(results.items), results)
 
           query[:limit] = query[:limit] - results.items.length if query[:limit]
 
           break if results.last_evaluated_key.nil? || query[:limit]&.zero?
 
-          (page_start = results.last_evaluated_key)
+          query[:exclusive_start_key] = results.last_evaluated_key
         end
       end.lazy
+    end
+
+    def construct_items(items)
+      (items || []).map do |item|
+        klass.from_database(item)
+      end
     end
 
     def each_page_via_query
