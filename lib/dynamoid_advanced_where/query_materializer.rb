@@ -73,7 +73,7 @@ module DynamoidAdvancedWhere
 
     def construct_items(items)
       (items || []).map do |item|
-        klass.from_database(item)
+        klass.from_database(item.symbolize_keys)
       end
     end
 
