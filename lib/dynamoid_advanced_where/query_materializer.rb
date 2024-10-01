@@ -81,7 +81,7 @@ module DynamoidAdvancedWhere
       query = {
         table_name: table_name,
         index_name: selected_index_for_query,
-        scan_index_forward: query_builder.scanning_index_forward
+        scan_index_forward: query_builder.scanning_index_forward,
       }.merge(filter_builder.to_query_filter)
 
       enumerate_results(query) do |q|
@@ -90,7 +90,7 @@ module DynamoidAdvancedWhere
     end
 
     def each_page_via_scan
-      raise "Unable to scan a table backwards" unless query_builder.scanning_index_forward
+      raise 'Unable to scan a table backwards' unless query_builder.scanning_index_forward
 
       query = {
         table_name: table_name,
