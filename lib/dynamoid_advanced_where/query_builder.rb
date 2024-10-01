@@ -6,16 +6,17 @@ require_relative './batched_updater'
 
 module DynamoidAdvancedWhere
   class QueryBuilder
-    attr_accessor :klass, :root_node, :start_hash, :record_limit, :projected_fields
+    attr_accessor :klass, :root_node, :start_hash, :record_limit, :projected_fields, :scanning_index_forward
 
     delegate :all, :each_page, :each, to: :query_materializer
 
-    def initialize(klass:, projected_fields: [], record_limit: nil, start_hash: nil, root_node: nil, &blk)
+    def initialize(klass:, projected_fields: [], record_limit: nil, start_hash: nil, root_node: nil, scanning_index_forward: true, &blk)
       self.klass = klass
       self.root_node = root_node || Nodes::RootNode.new(klass: klass, &blk)
       self.start_hash = start_hash
       self.record_limit = record_limit
       self.projected_fields = projected_fields
+      self.scanning_index_forward = scanning_index_forward
 
       freeze
     end
@@ -58,6 +59,10 @@ module DynamoidAdvancedWhere
       dup_with_changes(record_limit: value)
     end
 
+    def scan_index_forward(value)
+      dup_with_changes(scanning_index_forward: value)
+    end
+
     def start(key_hash)
       return self if key_hash.nil? || key_hash.empty?
 
@@ -74,6 +79,7 @@ module DynamoidAdvancedWhere
         start_hash: start_hash,
         root_node: root_node,
         projected_fields: projected_fields,
+        scanning_index_forward: scanning_index_forward,
       }.merge(changes))
     end
   end
