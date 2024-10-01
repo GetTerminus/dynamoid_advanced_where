@@ -188,6 +188,9 @@ Provided methods
 
 `.start({ some_hash_key: some_value })` takes a hash argument that must match the key structure of the table (range key must be specified where valid). If passed an empty hash, results will start from the beginning of the table. Records before the specified start key will not be scanned or returned. This is useful when doing manual pagination.
 
+### Scaning backwards
+`.scan_index_forward(false)` takes a boolean argument to indicate a query should be performed backwards. Errors if your query ends up scanning it will throw an error.
+
 ### Scan vs Query
 DAW will automatically preform a query when it determines it is possible,
 however if a query is determined to not be appropriate, a scan will be conduced
